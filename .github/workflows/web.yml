@@ -2,10 +2,14 @@ name: Web app
 
 on:
   push:
+    branches: [main]
     paths: ["web/**", ".github/workflows/web.yml"]
   pull_request:
     paths: ["web/**"]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -29,18 +33,30 @@ jobs:
         env:
           NEXT_PUBLIC_DEMO: "1"
           NEXT_TELEMETRY_DISABLED: "1"
-      - name: Screenshots on phone, tablet and desktop
+      - name: Install browser
         run: |
-          npm install --no-save --no-audit --no-fund playwright@1.55.0
+          npm install --no-save --no-audit --no-fund playwright
           npx playwright install --with-deps chromium
+      - name: Screenshots on phone, tablet and desktop
+        id: screens
+        run: |
           (npx next start -p 3000 > server.log 2>&1 &)
-          for i in $(seq 1 30); do curl -sf http://localhost:3000 >/dev/null && break; sleep 1; done
+          for i in $(seq 1 40); do curl -sf http://localhost:3000 >/dev/null && break; sleep 1; done
           BASE=http://localhost:3000 OUT=screens node scripts/screens.mjs
         env:
           NEXT_TELEMETRY_DISABLED: "1"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: screens
-          path: web/screens/
-          if-no-files-found: ignore
+      - name: Report server errors
+        if: failure()
+        run: tail -n 30 server.log | sed 's/^/::warning title=server.log::/' || true
+      - name: Publish screenshots to the ci-screens branch
+        if: always() && github.event_name == 'push'
+        run: |
+          [ -d screens ] || exit 0
+          cd screens
+          git init -q
+          git config user.name "ci"
+          git config user.email "ci@users.noreply.github.com"
+          git checkout -q -b ci-screens
+          git add -A
+          git commit -q -m "Screenshots for ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci-screens

@@ -14,6 +14,7 @@ const sizes = [
 ];
 const problems = [];
 const browser = await chromium.launch();
+const step = async (label, fn) => { try { await fn(); } catch (e) { problems.push(`${label}: ${String(e.message || e).split("\n")[0]}`); } };
 
 for (const scheme of ["light", "dark"]) {
   for (const size of sizes) {
@@ -28,32 +29,43 @@ for (const scheme of ["light", "dark"]) {
       await page.screenshot({ path: `${OUT}/${name}-${size.name}-${scheme}.png`, fullPage: true });
     };
 
-    await page.goto(BASE + "/");
-    await page.evaluate(() => localStorage.setItem("hariyata.demoOut", "1"));
-    await page.goto(BASE + "/"); await shot("landing");
-    await page.evaluate(() => localStorage.removeItem("hariyata.demoOut"));
-
-    await page.goto(BASE + "/check");
-    await page.waitForSelector("#checkInput");
-    await page.fill("#checkInput", "077 123 4567");
-    await page.click("button.go");
-    await page.waitForSelector(".result"); await page.waitForTimeout(900); await shot("check");
-
-    await page.goto(BASE + "/bulk");
-    await page.click("text=Paste an example list");
-    await page.click("text=Check all");
-    await page.waitForSelector(".dist"); await shot("bulk");
-
+    const tag = `${size.name}/${scheme}`;
+    await step(`landing ${tag}`, async () => {
+      await page.goto(BASE + "/");
+      await page.evaluate(() => localStorage.setItem("hariyata.demoOut", "1"));
+      await page.goto(BASE + "/"); await page.waitForSelector(".hero h1", { timeout: 15000 }); await shot("landing");
+      await page.evaluate(() => localStorage.removeItem("hariyata.demoOut"));
+    });
+    await step(`check ${tag}`, async () => {
+      await page.goto(BASE + "/check");
+      await page.waitForSelector("#checkInput", { timeout: 15000 });
+      await page.fill("#checkInput", "077 123 4567");
+      await page.click("button.go");
+      await page.waitForSelector(".result", { timeout: 15000 }); await page.waitForTimeout(900); await shot("check");
+    });
+    await step(`bulk ${tag}`, async () => {
+      await page.goto(BASE + "/bulk");
+      await page.click("text=Paste an example list", { timeout: 15000 });
+      await page.click("text=Check all");
+      await page.waitForSelector(".dist", { timeout: 15000 }); await shot("bulk");
+    });
     for (const p of ["report", "records", "billing", "admin", "info"]) {
-      await page.goto(BASE + "/" + p);
-      await page.waitForSelector("main h1");
-      await shot(p);
+      await step(`${p} ${tag}`, async () => {
+        await page.goto(BASE + "/" + p);
+        await page.waitForSelector("main h1", { timeout: 15000 });
+        await shot(p);
+      });
     }
-    await page.goto(BASE + "/admin"); await page.waitForSelector("text=Sellers");
-    await page.click("button[role=tab]:has-text('Sellers')"); await shot("admin-sellers");
+    await step(`admin-sellers ${tag}`, async () => {
+      await page.goto(BASE + "/admin"); await page.waitForSelector("button[role=tab]", { timeout: 15000 });
+      await page.click("button[role=tab]:has-text('Sellers')"); await shot("admin-sellers");
+    });
     await ctx.close();
   }
 }
 await browser.close();
-if (problems.length) { console.log(problems.join("\n")); process.exit(1); }
+if (problems.length) {
+  for (const p of problems.slice(0, 40)) console.log(`::error title=Screenshot::${p.replace(/[\r\n]+/g, " ")}`);
+  process.exit(1);
+}
 console.log("screens ok");
