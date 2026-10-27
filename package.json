@@ -1,0 +1,10 @@
+{
+  "name": "trivexparcel",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Hariyata by Trivex IT: COD trust check for Sri Lankan online sellers",
+  "scripts": {
+    "test": "node test/logic.test.js",
+    "build": "python3 scripts/build.py"
+  }
+}

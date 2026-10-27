@@ -1,0 +1,1066 @@
+<title>Hariyata</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,500..900&family=Schibsted+Grotesk:wght@400;500;600;700&family=Abhaya+Libre:wght@800&display=swap">
+<style>
+/* Layout: phone-first single column; the check result is a parcel slip with kraft tape and an inked rubber stamp. Bottom tab bar for thumb reach. Left-aligned throughout. */
+:root {
+  --ground: #E6ECE7;      /* pale tea-leaf grey */
+  --surface: #FBFCFA;
+  --ink: #10241C;         /* green-black */
+  --soft: #55665D;
+  --rule: #CFD9D2;
+  --tea: #0F5B3E;         /* Ceylon tea green, brand */
+  --tea-ink: #FFFFFF;
+  --kraft: #C99B5C;       /* parcel tape */
+  --kraft-ink: #3A2A12;
+  --good: #1D7A3B;
+  --watch: #B06C08;
+  --risk: #C1272D;        /* postal red */
+  --new: #5E6B64;
+  --good-wash: #DDEFE2;
+  --watch-wash: #F6E9D2;
+  --risk-wash: #F7DEDD;
+  --new-wash: #E3E8E5;
+  --focus: #1F6FD1;
+  --f-stamp: "Anybody", "Arial Narrow", Impact, sans-serif;
+  --f-body: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-si: "Abhaya Libre", "Noto Serif Sinhala", "Iskoola Pota", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0A1410; --surface: #12201A; --ink: #E2ECE6; --soft: #9AAEA3; --rule: #23362D;
+    --tea: #4DBE89; --tea-ink: #04140D; --kraft: #B98C50; --kraft-ink: #1E1405;
+    --good: #52C77E; --watch: #E7A646; --risk: #F2666B; --new: #9AAEA3;
+    --good-wash: #12301F; --watch-wash: #2F230E; --risk-wash: #351618; --new-wash: #1A2A23;
+    --focus: #7DB2FF; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0A1410; --surface: #12201A; --ink: #E2ECE6; --soft: #9AAEA3; --rule: #23362D;
+  --tea: #4DBE89; --tea-ink: #04140D; --kraft: #B98C50; --kraft-ink: #1E1405;
+  --good: #52C77E; --watch: #E7A646; --risk: #F2666B; --new: #9AAEA3;
+  --good-wash: #12301F; --watch-wash: #2F230E; --risk-wash: #351618; --new-wash: #1A2A23;
+  --focus: #7DB2FF; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--ground); color: var(--ink);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 calc(96px + env(safe-area-inset-bottom, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--ground); }
+.app { max-width: 540px; margin: 0 auto; display: grid; gap: 22px; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+a { color: var(--tea); }
+p { margin: 0; }
+h2, h3 { margin: 0; }
+
+/* Masthead */
+.mast { display: flex; align-items: center; gap: 12px; padding-top: 18px; }
+.mark {
+  width: 46px; height: 46px; border-radius: 12px; background: var(--tea); color: var(--tea-ink);
+  display: grid; place-items: center; font-family: var(--f-si); font-size: 25px; font-weight: 800; line-height: 1;
+  padding-top: 4px; flex: 0 0 auto;
+}
+.mast-text { display: grid; line-height: 1.15; min-width: 0; }
+.mast-text strong { font-family: var(--f-stamp); font-stretch: 112%; font-weight: 800; font-size: 22px; letter-spacing: -0.01em; }
+.mast-text span { font-size: 13px; color: var(--soft); }
+.beta { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--soft); border: 1px solid var(--rule); border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
+
+#connNote { font-size: 14px; border-radius: 10px; padding: 10px 14px; background: var(--new-wash); }
+#connNote.warn { background: var(--watch-wash); }
+
+/* Views */
+.view { display: grid; gap: 18px; }
+.view-head { display: grid; gap: 6px; }
+.view-head h2 { font-family: var(--f-stamp); font-stretch: 90%; font-weight: 800; font-size: clamp(26px, 7vw, 32px); line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; }
+.view-head p { color: var(--soft); max-width: 58ch; }
+
+/* Forms */
+.form { display: grid; gap: 10px; }
+.label { font-weight: 600; font-size: 15px; }
+.phone-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.phone {
+  width: 100%; min-width: 0; background: var(--surface); border: 2px solid var(--rule); border-radius: 14px;
+  padding: 14px 16px; font-size: 24px; font-weight: 600; letter-spacing: .03em; font-variant-numeric: tabular-nums;
+}
+.phone:focus { border-color: var(--tea); outline: none; }
+.phone::placeholder { color: var(--soft); opacity: .55; }
+textarea {
+  width: 100%; min-width: 0; min-height: 168px; resize: vertical; background: var(--surface);
+  border: 2px solid var(--rule); border-radius: 14px; padding: 14px 16px; font-size: 14px; line-height: 1.65;
+}
+textarea:focus, input[type=number]:focus { border-color: var(--tea); outline: none; }
+input[type=number] { width: 140px; background: var(--surface); border: 2px solid var(--rule); border-radius: 10px; padding: 10px 12px; font-variant-numeric: tabular-nums; font-weight: 600; }
+.go {
+  background: var(--tea); color: var(--tea-ink); border: 0; border-radius: 14px; padding: 0 20px;
+  font-weight: 700; font-size: 16px; cursor: pointer; min-height: 56px; white-space: nowrap;
+}
+.go:disabled { opacity: .5; cursor: progress; }
+.quiet { background: transparent; color: var(--ink); border: 2px solid var(--rule); border-radius: 12px; padding: 0 16px; min-height: 48px; font-weight: 600; cursor: pointer; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btns .go { min-height: 50px; }
+.hint { font-size: 13px; color: var(--soft); }
+.err { color: var(--risk); font-size: 14px; font-weight: 600; }
+
+/* Parcel slip */
+.slip {
+  position: relative; background: var(--surface); border-radius: 6px 6px 16px 16px;
+  box-shadow: 0 1px 0 var(--rule), 0 14px 30px -18px rgba(16, 36, 28, .45);
+  display: grid; overflow: hidden;
+}
+.tape {
+  height: 22px; background: var(--kraft);
+  background-image: repeating-linear-gradient(90deg, transparent 0 18px, rgba(0,0,0,.06) 18px 19px);
+}
+.slip-main { padding: 18px 18px 6px; display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; }
+.slip-num { font-size: 26px; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.slip-sub { font-size: 13px; color: var(--soft); grid-column: 1; }
+
+.stamp {
+  grid-row: 1 / span 2; grid-column: 2;
+  font-family: var(--f-stamp); font-stretch: 58%; font-weight: 900; text-transform: uppercase;
+  font-size: 30px; letter-spacing: .05em; line-height: 1; color: var(--c);
+  border: 4px solid var(--c); border-radius: 8px; padding: 8px 12px 6px; text-align: center;
+  transform: rotate(-8deg); white-space: nowrap;
+  box-shadow: inset 0 0 0 2px var(--surface), inset 0 0 0 4px var(--c);
+  -webkit-mask-image: var(--grain); mask-image: var(--grain); -webkit-mask-size: 160px; mask-size: 160px;
+}
+.stamp small { display: block; font-family: var(--f-body); font-size: 11px; font-weight: 700; letter-spacing: .02em; text-transform: none; margin-top: 4px; }
+.stamp.thunk { animation: thunk .42s cubic-bezier(.2, .9, .3, 1.3) both; }
+@keyframes thunk {
+  0% { transform: scale(1.9) rotate(-16deg); opacity: 0; }
+  55% { transform: scale(.94) rotate(-7deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+}
+.slip.jolt { animation: jolt .3s .2s ease-out; }
+@keyframes jolt { 0%,100% { transform: none; } 40% { transform: translateY(2px); } }
+
+.lv-good { --c: var(--good); --wash: var(--good-wash); }
+.lv-watch { --c: var(--watch); --wash: var(--watch-wash); }
+.lv-risk { --c: var(--risk); --wash: var(--risk-wash); }
+.lv-new { --c: var(--new); --wash: var(--new-wash); }
+
+/* Ruler: zones are the real thresholds (45 and 75) */
+.ruler-wrap { padding: 8px 18px 4px; display: grid; gap: 6px; }
+.ruler-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; }
+.ruler-head b { font-size: 20px; font-variant-numeric: tabular-nums; color: var(--c); }
+.ruler { position: relative; height: 14px; border-radius: 99px; overflow: visible;
+  background: linear-gradient(90deg, var(--risk-wash) 0 45%, var(--watch-wash) 45% 75%, var(--good-wash) 75% 100%);
+  border: 1px solid var(--rule); }
+.ruler i { position: absolute; top: -5px; width: 6px; height: 22px; border-radius: 3px; background: var(--c);
+  left: calc(var(--x, 0) * 1% - 3px); transition: left .6s cubic-bezier(.2,.8,.2,1); box-shadow: 0 0 0 2px var(--surface); }
+.ticks { position: relative; height: 16px; font-size: 11px; color: var(--soft); font-variant-numeric: tabular-nums; }
+.ticks span { position: absolute; transform: translateX(-50%); }
+.ticks span:first-child { transform: none; } .ticks span:last-child { transform: translateX(-100%); }
+
+.counts { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 8px 18px 0; font-size: 14px; color: var(--soft); }
+.counts b { color: var(--ink); font-size: 18px; font-variant-numeric: tabular-nums; margin-right: 4px; }
+.advice { margin: 14px 18px 0; background: var(--wash); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
+.advice strong { color: var(--c); }
+
+.tear { margin-top: 18px; height: 12px;
+  background: radial-gradient(circle at 6px 6px, var(--ground) 5px, transparent 5.5px) -6px 0 / 18px 12px repeat-x; }
+.slip-report { padding: 6px 18px 18px; display: grid; gap: 10px; }
+.slip-report h3 { font-size: 15px; font-weight: 700; }
+
+.outcomes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.oc {
+  border: 2px solid var(--rule); background: var(--surface); border-radius: 12px; padding: 10px 4px;
+  cursor: pointer; font-weight: 700; font-size: 14px; min-height: 64px; display: grid; gap: 4px; justify-items: center; align-content: center;
+}
+.oc svg { width: 22px; height: 22px; }
+.oc.del svg { color: var(--good); } .oc.rej svg { color: var(--watch); } .oc.fake svg { color: var(--risk); }
+.oc[aria-pressed="true"] { border-color: var(--ink); }
+.oc:disabled { opacity: .45; cursor: not-allowed; }
+.oc:not(:disabled):active { transform: translateY(1px); }
+
+/* Lists */
+.list { display: grid; }
+.item { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.item:last-child { border-bottom: 0; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px var(--wash); }
+.item .n { font-weight: 700; font-variant-numeric: tabular-nums; }
+.item .meta { font-size: 13px; color: var(--soft); }
+.item .verdict { font-size: 13px; font-weight: 700; color: var(--c); }
+.item .acts { grid-column: 2 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.tiny { border: 1px solid var(--rule); background: var(--surface); border-radius: 8px; padding: 4px 10px; min-height: 34px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.tiny:disabled { opacity: .45; }
+.tiny.danger[data-armed="1"] { border-color: var(--risk); color: var(--risk); }
+
+.section { display: grid; gap: 6px; }
+.section h3 { font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+.panel { background: var(--surface); border-radius: 16px; padding: 16px; display: grid; gap: 12px; }
+
+/* Bulk summary bar */
+.mix { display: flex; height: 12px; border-radius: 99px; overflow: hidden; background: var(--rule); }
+.mix span { background: var(--c); }
+.mix-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
+.mix-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.mix-legend i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.mix-legend b { font-variant-numeric: tabular-nums; }
+
+/* Records */
+.loss { display: grid; gap: 2px; }
+.loss b { font-family: var(--f-stamp); font-stretch: 80%; font-weight: 850; font-size: 40px; line-height: 1.05; font-variant-numeric: tabular-nums; color: var(--risk); }
+.tallies { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; color: var(--soft); }
+.tallies b { color: var(--ink); font-size: 18px; font-variant-numeric: tabular-nums; margin-right: 4px; }
+.fee-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; }
+.empty { color: var(--soft); font-size: 15px; padding: 18px; border: 2px dashed var(--rule); border-radius: 14px; }
+
+/* Info */
+.steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; }
+.steps li::before { content: counter(s); width: 30px; height: 30px; border-radius: 50%; background: var(--tea); color: var(--tea-ink); display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.legend { display: grid; gap: 12px; }
+.legend div { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: center; font-size: 15px; }
+.mini-stamp { font-family: var(--f-stamp); font-stretch: 58%; font-weight: 900; text-transform: uppercase; color: var(--c); border: 3px solid var(--c); border-radius: 6px; padding: 3px 6px 2px; text-align: center; font-size: 17px; letter-spacing: .04em; transform: rotate(-6deg); -webkit-mask-image: var(--grain); mask-image: var(--grain); -webkit-mask-size: 120px; mask-size: 120px; }
+.plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.plan { border: 2px solid var(--rule); border-radius: 12px; padding: 12px; display: grid; gap: 2px; align-content: start; font-size: 13px; color: var(--soft); }
+.plan strong { color: var(--ink); font-size: 14px; }
+.plan b { color: var(--ink); font-size: 18px; font-variant-numeric: tabular-nums; }
+.plan.pick { border-color: var(--tea); }
+.fine { font-size: 13px; color: var(--soft); }
+
+/* Bottom tab bar */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 8;
+  background: var(--surface); border-top: 1px solid var(--rule);
+  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+}
+.tabbar-in { max-width: 540px; margin: 0 auto; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.tabbar a {
+  display: grid; justify-items: center; gap: 2px; padding: 6px 2px; text-decoration: none;
+  color: var(--soft); font-size: 12px; font-weight: 600; border-radius: 10px;
+}
+.tabbar a svg { width: 24px; height: 24px; }
+.tabbar a[aria-current="page"] { color: var(--tea); }
+.tabbar a[aria-current="page"] svg { stroke-width: 2.4; }
+
+/* Admin */
+.role-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--c); background: var(--wash); border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
+.st-approved { --c: var(--good); --wash: var(--good-wash); }
+.st-pending { --c: var(--watch); --wash: var(--watch-wash); }
+.st-blocked { --c: var(--risk); --wash: var(--risk-wash); }
+.st-admin { --c: var(--tea); --wash: var(--new-wash); }
+.st-new { --c: var(--new); --wash: var(--new-wash); }
+.figs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.fig { display: grid; gap: 0; }
+.fig b { font-family: var(--f-stamp); font-stretch: 85%; font-weight: 850; font-size: 30px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.fig span { font-size: 13px; color: var(--soft); }
+.switch-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+.switch-row p { font-size: 14px; color: var(--soft); }
+.switch { position: relative; width: 52px; height: 30px; border-radius: 99px; border: 0; background: var(--rule); cursor: pointer; padding: 0; flex: 0 0 auto; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--surface); transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.switch[aria-checked="true"] { background: var(--tea); }
+.switch[aria-checked="true"]::after { left: 25px; }
+.switch:disabled { opacity: .5; }
+.filter { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter button { border: 1px solid var(--rule); background: var(--surface); border-radius: 99px; padding: 5px 12px; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 34px; }
+.filter button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.who { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.who img { width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto; }
+.who .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item.person { grid-template-columns: 1fr auto; }
+.item.person .acts { grid-column: 1 / -1; }
+.me-role { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+@media (max-width: 400px) { .figs { grid-template-columns: repeat(2, 1fr); } }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 20;
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink); color: var(--surface); border-radius: 14px; padding: 10px 10px 10px 16px;
+  display: flex; gap: 12px; align-items: center; width: max-content; max-width: calc(100% - 32px);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,.4); font-size: 14px;
+}
+.toast button { background: transparent; border: 1px solid currentColor; color: inherit; border-radius: 8px; padding: 6px 12px; font-weight: 700; cursor: pointer; }
+
+@media (max-width: 400px) {
+  .phone-row { grid-template-columns: 1fr; }
+  .go { min-height: 52px; }
+  .plans { grid-template-columns: 1fr; }
+  .stamp { font-size: 25px; padding: 7px 9px 5px; }
+  .slip-num { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp.thunk, .slip.jolt { animation: none; }
+  .ruler i { transition: none; }
+}
+</style>
+
+<div class="app">
+  <header class="mast">
+    <div class="mark" lang="si" aria-hidden="true">හ</div>
+    <div class="mast-text"><strong id="appName">Hariyata</strong><span>COD parcel check, Trivex IT</span></div>
+    <span class="beta">Beta</span>
+  </header>
+
+  <div id="connNote" hidden></div>
+
+  <!-- CHECK -->
+  <section class="view" data-view="check">
+    <div class="view-head">
+      <h2>Parcel eka yawanna kalin number eka balanna</h2>
+      <p>Customer kalin COD parcels baragaththada, reject karada kiyala anith sellersla report karapu data walin pennanawa.</p>
+    </div>
+    <form id="checkForm" class="form" novalidate>
+      <label class="label" for="checkInput">Customer ge phone number</label>
+      <div class="phone-row">
+        <input id="checkInput" class="phone" type="tel" inputmode="tel" autocomplete="off" placeholder="077 123 4567">
+        <button class="go" id="checkBtn" type="submit">Check karanna</button>
+      </div>
+      <p class="hint">07X, +94, 94 kohoma gahuwath hari.</p>
+      <p class="err" id="checkErr" hidden></p>
+    </form>
+    <div id="checkResult"></div>
+    <div class="section" id="historyBox" hidden>
+      <h3>Langadi check kala ewa <button class="tiny" id="clearHistory" type="button">Clear</button></h3>
+      <div class="list" id="historyList"></div>
+      <p class="fine">Me list eka oyage phone eke witharai thiyenne.</p>
+    </div>
+  </section>
+
+  <!-- BULK -->
+  <section class="view" data-view="bulk" hidden>
+    <div class="view-head">
+      <h2>Order list ekama ekaparin check karanna</h2>
+      <p>WhatsApp, Facebook, Excel kohen hari order list eka copy karala paste karanna. Numbers okkoma auto hoyagannawa.</p>
+    </div>
+    <form id="bulkForm" class="form" novalidate>
+      <label class="label" for="bulkInput">Order list</label>
+      <textarea id="bulkInput" spellcheck="false" placeholder="Order 1, Nimal, Kandy, 077 123 4567, Rs. 2500&#10;Order 2, Kumari, Galle, +94 71 234 5678"></textarea>
+      <p class="hint" id="bulkFound">Ekaparakata numbers 90 wenakam.</p>
+      <div class="btns">
+        <button class="go" id="bulkBtn" type="submit">Okkoma check karanna</button>
+        <button class="quiet" id="bulkSample" type="button">Example list ekak danna</button>
+      </div>
+      <p class="err" id="bulkErr" hidden></p>
+    </form>
+    <div id="bulkResult"></div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="view" data-view="report" hidden>
+    <div class="view-head">
+      <h2>Parcel eka mokada une?</h2>
+      <p>Oya danna hama result ekakma anith sellersla bera ganna udaw wenawa. Ek number ekata oyage record ekai, aye report kalama eka update wenawa.</p>
+    </div>
+    <form id="reportForm" class="form" novalidate>
+      <label class="label" for="reportInput">Customer ge phone number</label>
+      <input id="reportInput" class="phone" type="tel" inputmode="tel" autocomplete="off" placeholder="077 123 4567">
+      <span class="label" id="ocLabel">Result eka</span>
+      <div class="outcomes" id="reportChoices" role="group" aria-labelledby="ocLabel"></div>
+      <p class="hint"><b>Reject</b>: parcel eka gaththe na, nathnam call ekata answer kale na. <b>Fake</b>: boru nama, boru address, nathnam order ekak dapu bawa piligannne na.</p>
+      <div class="btns"><button class="go" id="reportBtn" type="submit" disabled>Report karanna</button></div>
+      <p class="err" id="reportErr" hidden></p>
+    </form>
+  </section>
+
+  <!-- RECORDS -->
+  <section class="view" data-view="me" hidden>
+    <div class="view-head">
+      <h2>Mage records</h2>
+      <p>Oya report karapu parcels saha reject walin aathi una padu.</p>
+    </div>
+    <div class="me-role" id="meRole"></div>
+    <div class="panel">
+      <div class="loss"><span class="hint">Reject saha fake walin courier gaana padu</span><b id="meLoss">Rs. 0</b></div>
+      <div class="tallies" id="meSummary">
+        <span><b data-k="total">0</b>reports</span>
+        <span><b data-k="del">0</b>delivered</span>
+        <span><b data-k="rej">0</b>reject</span>
+        <span><b data-k="fake">0</b>fake</span>
+      </div>
+      <div class="fee-row"><label for="feeInput">Ek parcel ekakata courier gaana Rs.</label><input id="feeInput" type="number" min="0" step="10" value="450" inputmode="numeric"></div>
+      <p class="fine">Return walata yana courier gaana witharai ganan karanne. Packing, stock hira wela thiyena kaale ekathu karanne na.</p>
+    </div>
+    <div class="section">
+      <h3>Oyage reports</h3>
+      <div class="list" id="meList"></div>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section class="view" data-view="admin" hidden>
+    <div class="view-head">
+      <h2>Admin panel</h2>
+      <p>Sellersla approve karanna, block karanna, waradi reports ain karanna.</p>
+    </div>
+    <div id="adminDenied" class="empty" hidden>Me page eka admins la ta witharai. Admin kenek wenna artifact owner gen Editor access illanna.</div>
+    <div id="adminBody" hidden>
+      <div class="view" style="gap:18px">
+        <div class="panel">
+          <div class="figs" id="adminFigs">
+            <div class="fig"><b data-f="reports">0</b><span>Reports</span></div>
+            <div class="fig"><b data-f="sellers">0</b><span>Sellers</span></div>
+            <div class="fig"><b data-f="pending">0</b><span>Approve karanna</span></div>
+            <div class="fig"><b data-f="blocked">0</b><span>Blocked</span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="switch-row">
+            <div><h3 style="font-size:16px">Aluth sellersla approve karanna one</h3>
+              <p>On kalama, admin approve karana kam aluth sellerge reports score ekata ekathu wenne na.</p></div>
+            <button type="button" class="switch" id="approvalSwitch" role="switch" aria-checked="false" aria-label="Aluth sellersla approve karanna one"></button>
+          </div>
+        </div>
+        <div class="section">
+          <h3>Sellers</h3>
+          <div class="filter" id="sellerFilter">
+            <button type="button" data-sf="all" aria-pressed="true">Okkoma</button>
+            <button type="button" data-sf="pending" aria-pressed="false">Approve karanna</button>
+            <button type="button" data-sf="approved" aria-pressed="false">Approved</button>
+            <button type="button" data-sf="blocked" aria-pressed="false">Blocked</button>
+          </div>
+          <div class="list" id="sellerList"></div>
+        </div>
+        <div class="section">
+          <h3>Aluthma reports</h3>
+          <div class="list" id="adminReports"></div>
+        </div>
+        <div class="panel">
+          <h3 style="font-size:16px">Roles wada karanne mehemai</h3>
+          <div class="legend">
+            <div><span class="role-pill st-admin">Admin</span><span>Owner saha Share menu eken <b>Editor</b> access dunna aya. Me panel eka pennanne ewunta witharai.</span></div>
+            <div><span class="role-pill st-approved">Seller</span><span>Share menu eken <b>Contributor</b> access dunna aya. Check saha report karanna puluwan.</span></div>
+            <div><span class="role-pill st-pending">Pending</span><span>Approval on nam, admin approve karana kam reports score ekata ganne na.</span></div>
+            <div><span class="role-pill st-blocked">Blocked</span><span>Report karanna ba. Kalin dapu reports score eken ain wenawa.</span></div>
+          </div>
+          <p class="fine">Aluth admin kenek add karanna: artifact eke Share menu eka open karala eyata Editor access denna.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section class="view" data-view="info" hidden>
+    <div class="view-head">
+      <h2>Hariyata wada karanne mehemai</h2>
+      <p>Lankawe online sellersla ekathu wela hadana COD trust network ekak.</p>
+    </div>
+    <ol class="steps">
+      <li><span>Order ekak awama customer ge number eka <b>Check</b> karanna.</span></li>
+      <li><span>Stamp eka balala COD yawanawada, advance gannawada kiyala theeranaya karanna.</span></li>
+      <li><span>Parcel eka giyata passe <b>Delivered</b>, <b>Reject</b>, nathnam <b>Fake</b> kiyala report karanna.</span></li>
+      <li><span>Hama sellerma report karana tharamata score eka hariyata hadenawa.</span></li>
+    </ol>
+    <div class="section">
+      <h3>Stamp eke theruma</h3>
+      <div class="legend">
+        <div><span class="mini-stamp lv-good">Hariyata</span><span>Score 75+. Kalin parcels hariyata baragena. COD yawanna puluwan.</span></div>
+        <div><span class="mini-stamp lv-watch">Balala</span><span>Score 45 to 74, nathnam data madi. Call ekak dala confirm karanna.</span></div>
+        <div><span class="mini-stamp lv-risk">Risk</span><span>Score 45 ta adui, sellersla godak denekta reject/fake. Advance nathuwa yawanna epa.</span></div>
+        <div><span class="mini-stamp lv-new">Aluth</span><span>Thama data na. Aluth customer kenek.</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>Saadharanaya saha privacy</h3>
+      <p>Phone number eka database ekata yanne na. Yanne SHA-256 hash ekak witharai, eken number eka aye hoyaganna amarui.</p>
+      <p>Ek seller kenekge ek report ekakin witharak kauruwath <b>Risk</b> wenne na. Fake order ekak reject ekakata wada deguna barai.</p>
+    </div>
+    <div class="section">
+      <h3>Plans</h3>
+      <div class="plans">
+        <div class="plan"><strong>Free</strong><b>Rs. 0</b><span>Maasekata checks 30</span></div>
+        <div class="plan pick"><strong>Starter</strong><b>Rs. 990</b><span>Checks 300, bulk check, WhatsApp bot</span></div>
+        <div class="plan"><strong>Pro</strong><b>Rs. 2,490</b><span>Unlimited, courier link, staff 3 denek</span></div>
+      </div>
+      <p class="fine">Beta eke danata hama feature ekakma free.</p>
+    </div>
+    <p class="fine">Hariyata v0.2 beta, Trivex IT. Score eka sellersla report karapu data walin witharai hadenne. Antima theeranaya oyage.</p>
+  </section>
+</div>
+
+<nav class="tabbar" aria-label="Sections">
+  <div class="tabbar-in">
+    <a href="#check" data-route="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Check</a>
+    <a href="#bulk" data-route="bulk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>List</a>
+    <a href="#report" data-route="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Report</a>
+    <a href="#me" data-route="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Records</a>
+    <a href="#admin" data-route="admin" id="adminTab" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/><path d="M17 4l1.5 1.5L21 3"/></svg>Admin</a>
+    <a href="#info" data-route="info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>Info</a>
+  </div>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button id="toastUndo" type="button" hidden>Undo</button></div>
+
+<script>
+/*LOGIC*/
+</script>
+<script>
+(function () {
+  const H = window.Hariyata;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // Ink grain for stamps: an SVG noise mask so the ink looks pressed, not printed.
+  const grain = `url("data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.9 1.2"/></filter><rect width="160" height="160" filter="url(#n)"/></svg>')}")`;
+  document.documentElement.style.setProperty("--grain", grain);
+
+  const ICON = {
+    del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    rej: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>',
+    fake: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+  };
+  const LEVEL = {
+    good:  { stamp: "Hariyata", sub: "COD yawanna", advice: "<strong>COD yawanna puluwan.</strong> Kalin sellersla ta parcels hariyata baragena thiyenawa." },
+    watch: { stamp: "Balala", sub: "Call karala confirm", advice: "<strong>Yawanna kalin call ekak dala confirm karanna.</strong> Puluwan nam delivery gaana advance ganna." },
+    risk:  { stamp: "Risk", sub: "Advance ganna", advice: "<strong>Advance nathuwa COD yawanna epa.</strong> Me number ekata sellersla godak denekta parcels reject nathnam fake wela." },
+    new:   { stamp: "Aluth", sub: "Thama data na", advice: "<strong>Me number eka gana thama data na.</strong> Confirm call ekak dala yawanna. Parcel eka giyata passe result eka report karanna." }
+  };
+  const OUT = { del: "Delivered", rej: "Reject una", fake: "Fake order" };
+
+  const S = { db: null, user: null, uid: null, canWrite: null, isAdmin: false, isOwner: false, ready: false, tried: false, readOnly: false,
+    myDocs: [], unsubMe: null, roles: {}, config: { requireApproval: false }, allReports: [], unsubAdmin: null, sellerFilter: "all" };
+
+  // Role of a seller id, as everyone's page computes it.
+  function statusOf(uid) {
+    const r = S.roles[safeId(uid)];
+    if (r && r.status === "blocked") return "blocked";
+    if (r && r.status === "approved") return "approved";
+    return S.config.requireApproval ? "pending" : "approved";
+  }
+  const counts = (uid) => statusOf(uid) === "approved";
+
+  const LS = {
+    get(k, d) { try { const v = localStorage.getItem("hariyata." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem("hariyata." + k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  // ---------- routing ----------
+  const ROUTES = ["check", "bulk", "report", "me", "admin", "info"];
+  function route() {
+    const r = (location.hash || "").replace("#", "");
+    const cur = ROUTES.includes(r) ? r : "check";
+    $$("[data-view]").forEach(v => v.hidden = v.dataset.view !== cur);
+    $$(".tabbar a").forEach(a => { if (a.dataset.route === cur) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  }
+  window.addEventListener("hashchange", () => { route(); window.scrollTo(0, 0); });
+  route();
+
+  // ---------- toast ----------
+  let toastTimer = null, toastUndoFn = null;
+  function toast(msg, undoFn) {
+    $("#toastMsg").textContent = msg;
+    toastUndoFn = undoFn || null;
+    $("#toastUndo").hidden = !undoFn;
+    $("#toast").hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { $("#toast").hidden = true; toastUndoFn = null; }, undoFn ? 7000 : 3500);
+  }
+  $("#toastUndo").addEventListener("click", async () => {
+    const fn = toastUndoFn; toastUndoFn = null; $("#toast").hidden = true;
+    if (fn) { try { await fn(); toast("Report eka aye gaththa"); } catch (e) { toast("Aye ganna bari una. Thawa paarak try karanna."); } }
+  });
+
+  function setNote(text, warn) {
+    const n = $("#connNote");
+    if (!text) { n.hidden = true; return; }
+    n.textContent = text; n.className = warn ? "warn" : ""; n.hidden = false;
+  }
+  setNote("Seller network ekata connect wenawa…");
+
+  // ---------- data ----------
+  const safeId = (s) => String(s).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_");
+  const docIdFor = (hash) => hash + "-" + safeId(S.uid);
+  async function withRetry(fn) {
+    try { return await fn(); }
+    catch (e) {
+      if (e && e.code === "unavailable") { await new Promise(r => setTimeout(r, 400 + Math.random() * 600)); return await fn(); }
+      throw e;
+    }
+  }
+  async function lookup(nums) {
+    const hashes = await Promise.all(nums.map(H.hashNumber));
+    const byHash = new Map();
+    for (let i = 0; i < hashes.length; i += 30) {
+      const chunk = hashes.slice(i, i + 30);
+      const snap = await withRetry(() => S.db.collection("reports").where("h", "in", chunk).get());
+      for (const d of snap.docs) {
+        const b = d.data(); if (!b) continue;
+        if (!byHash.has(b.h)) byHash.set(b.h, []);
+        byHash.get(b.h).push(b);
+      }
+    }
+    const out = new Map();
+    nums.forEach((n, i) => {
+      const all = byHash.get(hashes[i]) || [];
+      const docs = all.filter(d => counts(d.by));
+      const agg = H.aggregate(docs);
+      out.set(n, { hash: hashes[i], agg, sc: H.score(agg), mine: all.find(d => d.by === S.uid) || null });
+    });
+    return out;
+  }
+  async function report(n, outcome) {
+    const hash = await H.hashNumber(n);
+    const ref = S.db.doc("reports/" + docIdFor(hash));
+    const snap = await withRetry(() => ref.get());
+    const prev = snap.exists ? JSON.parse(JSON.stringify(snap.data())) : null;
+    const body = prev ? JSON.parse(JSON.stringify(prev)) : { h: hash, by: S.uid, del: 0, rej: 0, fake: 0, m: H.masked(n) };
+    body[outcome] = (body[outcome] | 0) + 1;
+    body.last = outcome;
+    body.at = new Date().toISOString();
+    await withRetry(() => ref.set(body));
+    return { undo: async () => { if (prev) await ref.set(prev); else await ref.delete(); } };
+  }
+  function writeErrMsg(e) {
+    const c = e && e.code;
+    if (c === "invalid_argument") { S.readOnly = true; applyWriteState(); return "Oyata report karanna access na. Artifact owner gen Contributor access illanna."; }
+    if (c === "quota_exceeded") return "Database eka full. Trivex team ekata kiyanna.";
+    if (c === "resource_exhausted") return "Godak ikmanata requests yawala. Thathpara kipayakin aye try karanna.";
+    return "Save une na. Internet eka check karala aye try karanna.";
+  }
+  const readErrMsg = () => "Check karanna bari una. Internet eka check karala aye try karanna.";
+  const canReport = () => !!(S.ready && S.uid && !S.readOnly && S.canWrite !== false && statusOf(S.uid) !== "blocked");
+  const noReportReason = () => !S.uid ? "Report karanna sign in wela inna one."
+    : statusOf(S.uid) === "blocked" ? "Oyage account eka admin block karala. Report karanna ba."
+    : "Report karanna access na.";
+
+  // ---------- slip ----------
+  function outcomeButtons(attrs) {
+    const w = canReport();
+    return ["del", "rej", "fake"].map(o => `<button type="button" class="oc ${o}" ${attrs(o)} ${w ? "" : "disabled"}>${ICON[o]}${OUT[o]}</button>`).join("");
+  }
+  function slipHTML(n, r) {
+    const L = LEVEL[r.sc.level];
+    const a = r.agg;
+    const mine = r.mine;
+    const score = r.sc.score;
+    return `
+      <article class="slip lv-${r.sc.level}" aria-live="polite">
+        <div class="tape"></div>
+        <div class="slip-main">
+          <div class="slip-num">${esc(H.pretty(n))}</div>
+          <div class="stamp" role="img" aria-label="${L.stamp}: ${L.sub}">${L.stamp}<small>${L.sub}</small></div>
+          <div class="slip-sub">${H.isMobile(n) ? "Customer number" : "Landline ekak wage"}${a.sellers ? `, sellersla ${a.sellers} denek report karala` : ""}</div>
+        </div>
+        <div class="ruler-wrap">
+          <div class="ruler-head"><span>Trust score</span><b>${score == null ? "Thama na" : score}</b></div>
+          <div class="ruler" role="img" aria-label="${score == null ? "No score yet" : "Score " + score + " of 100"}">${score == null ? "" : `<i style="--x:0" data-x="${score}"></i>`}</div>
+          <div class="ticks" aria-hidden="true"><span style="left:0">0</span><span style="left:45%">45</span><span style="left:75%">75</span><span style="left:100%">100</span></div>
+        </div>
+        <div class="counts">
+          <span><b>${a.del}</b>delivered</span><span><b>${a.rej}</b>reject</span><span><b>${a.fake}</b>fake</span>
+        </div>
+        <p class="advice">${L.advice}</p>
+        <div class="tear" aria-hidden="true"></div>
+        <div class="slip-report">
+          <h3>Parcel eka giyata passe mehenma report karanna</h3>
+          <div class="outcomes">${outcomeButtons(o => `data-rep="${o}"`)}</div>
+          ${mine ? `<p class="hint">Oyage record: delivered ${mine.del | 0}, reject ${mine.rej | 0}, fake ${mine.fake | 0}</p>` : ""}
+          ${canReport() ? "" : `<p class="hint">${noReportReason()}</p>`}
+        </div>
+      </article>`;
+  }
+  function settle(root, stampIt) {
+    const st = $(".stamp", root), sl = $(".slip", root);
+    if (stampIt && st) { st.classList.add("thunk"); sl && sl.classList.add("jolt"); }
+    requestAnimationFrame(() => requestAnimationFrame(() => $$(".ruler i", root).forEach(i => i.style.setProperty("--x", i.dataset.x))));
+  }
+
+  // ---------- check ----------
+  let lastChecked = null;
+  async function runCheck(raw) {
+    const err = $("#checkErr"); err.hidden = true;
+    const n = H.normalize(raw);
+    if (!n) { err.textContent = "Number eka hari na. 077 123 4567 wage digits 10 gahala balanna."; err.hidden = false; return; }
+    if (!S.ready) { err.textContent = S.tried ? "Check karanna sign in wela inna one." : "Thama connect wenawa. Thathpara kipayakin aye try karanna."; err.hidden = false; return; }
+    const btn = $("#checkBtn"); btn.disabled = true; btn.textContent = "Balanawa…";
+    try {
+      const res = (await lookup([n])).get(n);
+      lastChecked = n;
+      renderCheck(n, res, true);
+      pushHistory(n, res.sc.level);
+    } catch (e) { err.textContent = readErrMsg(e); err.hidden = false; }
+    finally { btn.disabled = false; btn.textContent = "Check karanna"; }
+  }
+  function renderCheck(n, res, stampIt) {
+    const box = $("#checkResult");
+    box.innerHTML = slipHTML(n, res);
+    settle(box, stampIt);
+    $$("[data-rep]", box).forEach(b => b.addEventListener("click", () => doReport(n, b.dataset.rep, b, async () => {
+      const fresh = (await lookup([n])).get(n); renderCheck(n, fresh, true); pushHistory(n, fresh.sc.level);
+    })));
+  }
+  $("#checkForm").addEventListener("submit", (e) => { e.preventDefault(); runCheck($("#checkInput").value); });
+
+  async function doReport(n, outcome, btn, after) {
+    if (!canReport()) return;
+    const btns = btn ? $$("button", btn.parentElement) : [];
+    btns.forEach(b => b.disabled = true);
+    try {
+      const { undo } = await report(n, outcome);
+      toast(`${H.masked(n)}: ${OUT[outcome]} kiyala report kala`, async () => { await undo(); if (after) await after(); });
+      if (after) await after();
+    } catch (e) {
+      toast(writeErrMsg(e));
+      btns.forEach(b => b.disabled = !canReport());
+    }
+  }
+
+  // ---------- history ----------
+  function pushHistory(n, level) {
+    let h = LS.get("history", []).filter(x => x.n !== n);
+    h.unshift({ n, level, t: Date.now() });
+    LS.set("history", h.slice(0, 8)); renderHistory();
+  }
+  function timeAgo(t) {
+    const s = Math.round((Date.now() - t) / 1000);
+    if (s < 60) return "Dan";
+    if (s < 3600) return Math.floor(s / 60) + " min kalin";
+    if (s < 86400) return Math.floor(s / 3600) + " paya kalin";
+    return Math.floor(s / 86400) + " dawasa kalin";
+  }
+  function renderHistory() {
+    const h = LS.get("history", []);
+    $("#historyBox").hidden = h.length === 0;
+    $("#historyList").innerHTML = h.map(x => {
+      const lv = LEVEL[x.level] ? x.level : "new";
+      return `<div class="item lv-${lv}">
+        <span class="dot"></span>
+        <div><div class="n">${esc(H.pretty(x.n))}</div><div class="meta">${timeAgo(x.t)}</div></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="verdict">${LEVEL[lv].stamp}</span><button class="tiny" type="button" data-recheck="${esc(x.n)}">Aye balanna</button></div>
+      </div>`;
+    }).join("");
+    $$("[data-recheck]").forEach(b => b.addEventListener("click", () => {
+      $("#checkInput").value = H.pretty(b.dataset.recheck); runCheck(b.dataset.recheck);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }));
+  }
+  $("#clearHistory").addEventListener("click", () => { LS.set("history", []); renderHistory(); });
+  renderHistory();
+
+  // ---------- bulk ----------
+  const SAMPLE = `Example list (boru numbers)
+Order #1041, Nimal Perera, Kandy, 077 123 4567, Rs. 2,450 COD
+Order #1042, Kumari, Galle, +94 71 234 5678, items 2
+#1043 Sahan | Kurunegala | 0761112223 | Rs.3900
+Order #1044, Fathima, Colombo 10, 075-998-1200
+#1045 Dinesh, Matara 0702223334 (call after 6pm)`;
+  function updateFound() {
+    const k = H.extract($("#bulkInput").value).length;
+    $("#bulkFound").textContent = k ? `Numbers ${k} hambuna.${k > 90 ? " Mul 90 witharai check karanne." : ""}` : "Ekaparakata numbers 90 wenakam.";
+  }
+  $("#bulkSample").addEventListener("click", () => { $("#bulkInput").value = SAMPLE; updateFound(); });
+  $("#bulkInput").addEventListener("input", updateFound);
+  let bulkNums = [];
+  $("#bulkForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const err = $("#bulkErr"); err.hidden = true;
+    const nums = H.extract($("#bulkInput").value).slice(0, 90);
+    if (!nums.length) { err.textContent = "List eke phone numbers hambune na. 077 123 4567 wage numbers thiyenawada balanna."; err.hidden = false; return; }
+    if (!S.ready) { err.textContent = S.tried ? "Check karanna sign in wela inna one." : "Thama connect wenawa. Thathpara kipayakin aye try karanna."; err.hidden = false; return; }
+    const btn = $("#bulkBtn"); btn.disabled = true; btn.textContent = "Balanawa…";
+    try { bulkNums = nums; await renderBulk(); }
+    catch (e2) { err.textContent = readErrMsg(e2); err.hidden = false; }
+    finally { btn.disabled = false; btn.textContent = "Okkoma check karanna"; }
+  });
+  async function renderBulk() {
+    const res = await lookup(bulkNums);
+    const order = { risk: 0, watch: 1, new: 2, good: 3 };
+    const rows = bulkNums.map(n => ({ n, r: res.get(n) })).sort((a, b) => order[a.r.sc.level] - order[b.r.sc.level]);
+    const count = { risk: 0, watch: 0, new: 0, good: 0 };
+    rows.forEach(x => count[x.r.sc.level]++);
+    const total = rows.length;
+    const lv = ["risk", "watch", "new", "good"];
+    $("#bulkResult").innerHTML = `
+      <div class="panel">
+        <div class="mix" role="img" aria-label="Risk ${count.risk}, Balala ${count.watch}, Aluth ${count.new}, Hariyata ${count.good}">
+          ${lv.filter(k => count[k]).map(k => `<span class="lv-${k}" style="width:${(count[k] / total) * 100}%"></span>`).join("")}
+        </div>
+        <div class="mix-legend">${lv.map(k => `<span class="lv-${k}"><i></i>${LEVEL[k].stamp} <b>${count[k]}</b></span>`).join("")}</div>
+        <div class="list">
+          ${rows.map(({ n, r }) => `
+            <div class="item lv-${r.sc.level}">
+              <span class="dot"></span>
+              <div><div class="n">${esc(H.pretty(n))}</div>
+                <div class="meta">delivered ${r.agg.del}, reject ${r.agg.rej}, fake ${r.agg.fake}${r.sc.score == null ? "" : `, score ${r.sc.score}`}</div></div>
+              <span class="verdict">${LEVEL[r.sc.level].stamp}</span>
+              <div class="acts">${["del", "rej", "fake"].map(o => `<button type="button" class="tiny" data-bn="${n}" data-bo="${o}" ${canReport() ? "" : "disabled"}>${OUT[o]}</button>`).join("")}</div>
+            </div>`).join("")}
+        </div>
+        <p class="fine">Risk ewa udinma pennanawa. Parcel giyata passe mehenma report karanna puluwan.</p>
+      </div>`;
+    $$("[data-bn]", $("#bulkResult")).forEach(b => b.addEventListener("click", () => doReport(b.dataset.bn, b.dataset.bo, b, renderBulk)));
+  }
+
+  // ---------- report ----------
+  let chosen = null;
+  $("#reportChoices").innerHTML = ["del", "rej", "fake"].map(o => `<button type="button" class="oc ${o}" data-outcome="${o}" aria-pressed="false">${ICON[o]}${OUT[o]}</button>`).join("");
+  $$("#reportChoices .oc").forEach(b => b.addEventListener("click", () => {
+    chosen = b.dataset.outcome;
+    $$("#reportChoices .oc").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    $("#reportBtn").disabled = !canReport();
+  }));
+  $("#reportForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const err = $("#reportErr"); err.hidden = true;
+    const n = H.normalize($("#reportInput").value);
+    if (!n) { err.textContent = "Number eka hari na. 077 123 4567 wage digits 10 gahala balanna."; err.hidden = false; return; }
+    if (!chosen) { err.textContent = "Delivered, Reject, Fake eken ekak thoranna."; err.hidden = false; return; }
+    if (!canReport()) { err.textContent = noReportReason(); err.hidden = false; return; }
+    const btn = $("#reportBtn"); btn.disabled = true; btn.textContent = "Save karanawa…";
+    try {
+      const { undo } = await report(n, chosen);
+      toast(`${H.masked(n)}: ${OUT[chosen]} kiyala report kala`, undo);
+      $("#reportInput").value = ""; chosen = null;
+      $$("#reportChoices .oc").forEach(x => x.setAttribute("aria-pressed", "false"));
+      btn.textContent = "Report karanna"; btn.disabled = true;
+    } catch (e2) {
+      err.textContent = writeErrMsg(e2); err.hidden = false;
+      btn.textContent = "Report karanna"; btn.disabled = !canReport();
+    }
+  });
+
+  // ---------- records ----------
+  const feeInput = $("#feeInput");
+  feeInput.value = LS.get("fee", 450);
+  feeInput.addEventListener("input", () => { LS.set("fee", Math.max(0, Number(feeInput.value) || 0)); renderMe(); });
+  function renderMe() {
+    const docs = S.myDocs;
+    const t = { total: docs.length, del: 0, rej: 0, fake: 0 };
+    docs.forEach(d => { t.del += d.del | 0; t.rej += d.rej | 0; t.fake += d.fake | 0; });
+    $$("#meSummary [data-k]").forEach(b => b.textContent = t[b.dataset.k]);
+    const fee = Math.max(0, Number(feeInput.value) || 0);
+    $("#meLoss").textContent = "Rs. " + ((t.rej + t.fake) * fee).toLocaleString("en-US");
+    const list = $("#meList");
+    if (!S.uid) { list.innerHTML = `<p class="empty">Oyage records balanna sign in wela inna one.</p>`; return; }
+    if (!docs.length) { list.innerHTML = `<p class="empty">Thama reports na. Parcel ekak giyata passe <a href="#report">Report</a> tab eken result eka danna.</p>`; return; }
+    const sorted = docs.slice().sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    list.innerHTML = sorted.map(d => {
+      const lv = d.last === "del" ? "good" : d.last === "rej" ? "watch" : "risk";
+      return `<div class="item lv-${lv}">
+        <span class="dot"></span>
+        <div><div class="n">${esc(d.m || "Number")}</div>
+          <div class="meta">delivered ${d.del | 0}, reject ${d.rej | 0}, fake ${d.fake | 0}${d.at ? ", " + esc(new Date(d.at).toLocaleDateString("en-GB")) : ""}</div></div>
+        <span class="verdict">${esc(OUT[d.last] || "")}</span>
+        <div class="acts"><button class="tiny danger" type="button" data-del="${esc(d._id)}">Record eka ain karanna</button></div>
+      </div>`;
+    }).join("");
+    $$("[data-del]", list).forEach(b => b.addEventListener("click", async () => {
+      if (b.dataset.armed !== "1") {
+        b.dataset.armed = "1"; b.textContent = "Ain karanna aye click karanna";
+        setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "Record eka ain karanna"; } }, 4000);
+        return;
+      }
+      b.disabled = true;
+      const ref = S.db.doc("reports/" + b.dataset.del);
+      try {
+        const snap = await ref.get();
+        const prev = snap.exists ? JSON.parse(JSON.stringify(snap.data())) : null;
+        await ref.delete();
+        toast("Record eka ain kala", prev ? () => ref.set(prev) : null);
+      } catch (e) { toast(writeErrMsg(e)); b.disabled = false; }
+    }));
+  }
+  function subscribeMe() {
+    if (S.unsubMe || !S.db || !S.uid) return;
+    S.unsubMe = S.db.collection("reports").where("by", "==", S.uid).onSnapshot(snap => {
+      S.myDocs = snap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+      renderMe();
+    }, () => {});
+  }
+  renderMe();
+
+  function applyWriteState() {
+    const w = canReport();
+    $("#reportBtn").disabled = !(w && chosen);
+    $$("[data-rep], [data-bn]").forEach(b => b.disabled = !w);
+    const st = S.uid ? statusOf(S.uid) : null;
+    if (S.ready && !w) setNote(noReportReason() + (S.uid && st !== "blocked" ? " Check karanna nam puluwan." : ""), true);
+    else if (S.ready && st === "pending" && !S.isAdmin) setNote("Oyage account eka admin approve karana kam oyage reports score ekata ekathu wenne na. Check karanna saha report karanna puluwan.", true);
+    else if (S.ready) setNote("");
+    renderMeRole();
+  }
+  function renderMeRole() {
+    const el = $("#meRole"); if (!el) return;
+    if (!S.uid) { el.innerHTML = ""; return; }
+    const st = S.isAdmin ? "admin" : statusOf(S.uid);
+    const label = { admin: S.isOwner ? "Owner" : "Admin", approved: "Seller", pending: "Pending approval", blocked: "Blocked" }[st];
+    el.innerHTML = `<span>Oyage role:</span><span class="role-pill st-${st}">${label}</span>`;
+  }
+
+  // ---------- roles & config (everyone reads) ----------
+  function subscribeRoles() {
+    S.db.collection("roles").onSnapshot(snap => {
+      const m = {}; snap.docs.forEach(d => { m[d.id] = d.data(); }); S.roles = m;
+      applyWriteState(); renderAdmin();
+    }, () => {});
+    S.db.doc("config/settings").onSnapshot(snap => {
+      S.config = Object.assign({ requireApproval: false }, snap.exists ? snap.data() : {});
+      applyWriteState(); renderAdmin();
+    }, () => {});
+  }
+
+  // ---------- admin ----------
+  function adminErr(e) {
+    const c = e && e.code;
+    if (c === "invalid_argument") return "Me wenas karanna admin (Editor) access one.";
+    return "Save une na. Internet eka check karala aye try karanna.";
+  }
+  async function setStatus(uid, status) {
+    const ref = S.db.doc("roles/" + safeId(uid));
+    const snap = await ref.get();
+    const prev = snap.exists ? JSON.parse(JSON.stringify(snap.data())) : null;
+    await ref.set({ uid, status, by: S.uid, at: new Date().toISOString() });
+    return async () => { if (prev) await ref.set(prev); else await ref.delete(); };
+  }
+  function subscribeAdmin() {
+    if (S.unsubAdmin || !S.isAdmin) return;
+    S.unsubAdmin = S.db.collection("reports").orderBy("at", "desc").limit(1000).onSnapshot(snap => {
+      S.allReports = snap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+      renderAdmin();
+    }, () => {});
+  }
+  let adminRenderSeq = 0;
+  async function renderAdmin() {
+    if (!S.isAdmin) return;
+    const seq = ++adminRenderSeq;
+    const reps = S.allReports;
+    const sellers = new Map();
+    reps.forEach(r => {
+      if (!r.by) return;
+      const s = sellers.get(r.by) || { uid: r.by, n: 0, del: 0, rej: 0, fake: 0, at: "" };
+      s.n++; s.del += r.del | 0; s.rej += r.rej | 0; s.fake += r.fake | 0;
+      if (String(r.at) > s.at) s.at = String(r.at);
+      sellers.set(r.by, s);
+    });
+    // Sellers blocked or approved before they reported still show up.
+    Object.values(S.roles).forEach(r => { if (r && r.uid && !sellers.has(r.uid)) sellers.set(r.uid, { uid: r.uid, n: 0, del: 0, rej: 0, fake: 0, at: "" }); });
+    const list = Array.from(sellers.values());
+    const ids = list.map(s => s.uid).concat(reps.slice(0, 30).map(r => r.by)).filter(Boolean);
+    const ps = ids.length && S.user ? await S.user.profiles(Array.from(new Set(ids))) : {};
+    if (seq !== adminRenderSeq) return;
+    const nameOf = (id) => (ps[id] && ps[id].name) || (id === S.uid ? "Oya" : "Seller");
+    const avatarOf = (id) => (ps[id] && ps[id].avatarUrl) || "";
+
+    const st = list.map(s => statusOf(s.uid));
+    const f = { reports: reps.length, sellers: list.length, pending: st.filter(x => x === "pending").length, blocked: st.filter(x => x === "blocked").length };
+    $$("#adminFigs [data-f]").forEach(b => b.textContent = f[b.dataset.f]);
+
+    const sw = $("#approvalSwitch");
+    sw.setAttribute("aria-checked", String(!!S.config.requireApproval));
+
+    const filt = S.sellerFilter;
+    const shown = list.filter(s => filt === "all" || statusOf(s.uid) === filt)
+      .sort((a, b) => ({ pending: 0, blocked: 1, approved: 2 }[statusOf(a.uid)] - { pending: 0, blocked: 1, approved: 2 }[statusOf(b.uid)]) || b.n - a.n);
+    const sl = $("#sellerList");
+    if (!shown.length) sl.innerHTML = `<p class="empty">${list.length ? "Me filter ekata sellersla na." : "Thama kauruwath report karala na. Sellersla report karanna patan gaththama methana pennanawa."}</p>`;
+    else {
+      sl.innerHTML = shown.map(s => {
+        const status = statusOf(s.uid);
+        const lab = { approved: "Approved", pending: "Pending", blocked: "Blocked" }[status];
+        const badRate = (s.del + s.rej + s.fake) ? Math.round(((s.rej + s.fake) / (s.del + s.rej + s.fake)) * 100) : 0;
+        const acts = [];
+        if (status !== "approved") acts.push(`<button class="tiny" type="button" data-act="approved" data-uid="${esc(s.uid)}">Approve karanna</button>`);
+        if (status !== "blocked" && s.uid !== S.uid) acts.push(`<button class="tiny danger" type="button" data-act="blocked" data-uid="${esc(s.uid)}">Block karanna</button>`);
+        if (status === "blocked") acts.push(`<button class="tiny" type="button" data-act="clear" data-uid="${esc(s.uid)}">Unblock karanna</button>`);
+        return `<div class="item person">
+          <div class="who"><img alt="" data-av="${esc(s.uid)}"><div style="min-width:0"><div class="n" data-nm="${esc(s.uid)}"></div>
+            <div class="meta">reports ${s.n}, reject/fake ${badRate}%${s.at ? ", " + esc(new Date(s.at).toLocaleDateString("en-GB")) : ""}</div></div></div>
+          <span class="role-pill st-${status}">${lab}</span>
+          <div class="acts">${acts.join("")}</div>
+        </div>`;
+      }).join("");
+      $$("[data-nm]", sl).forEach(el => el.textContent = nameOf(el.dataset.nm));
+      $$("[data-av]", sl).forEach(el => { const a = avatarOf(el.dataset.av); if (a) el.src = a; else el.hidden = true; });
+      $$("[data-act]", sl).forEach(b => b.addEventListener("click", async () => {
+        const uid = b.dataset.uid, act = b.dataset.act;
+        if (act === "blocked" && b.dataset.armed !== "1") {
+          b.dataset.armed = "1"; b.textContent = "Block karanna aye click karanna";
+          setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "Block karanna"; } }, 4000);
+          return;
+        }
+        b.disabled = true;
+        try {
+          const status = act === "clear" ? "approved" : act;
+          const undo = await setStatus(uid, status);
+          toast(`${nameOf(uid)}: ${ { approved: act === "clear" ? "unblock kala" : "approve kala", blocked: "block kala" }[status] }`, undo);
+        } catch (e) { toast(adminErr(e)); b.disabled = false; }
+      }));
+    }
+
+    const ar = $("#adminReports");
+    const recent = reps.slice(0, 30);
+    if (!recent.length) ar.innerHTML = `<p class="empty">Thama reports na.</p>`;
+    else {
+      ar.innerHTML = recent.map(r => {
+        const lv = r.last === "del" ? "good" : r.last === "rej" ? "watch" : "risk";
+        const off = !counts(r.by);
+        return `<div class="item lv-${lv}">
+          <span class="dot"></span>
+          <div><div class="n">${esc(r.m || "Number")}</div>
+            <div class="meta"><span data-nm="${esc(r.by || "")}"></span>, delivered ${r.del | 0}, reject ${r.rej | 0}, fake ${r.fake | 0}${r.at ? ", " + esc(new Date(r.at).toLocaleDateString("en-GB")) : ""}${off ? ", score ekata ganne na" : ""}</div></div>
+          <span class="verdict">${esc(OUT[r.last] || "")}</span>
+          <div class="acts"><button class="tiny danger" type="button" data-rdel="${esc(r._id)}">Report eka ain karanna</button></div>
+        </div>`;
+      }).join("");
+      $$("[data-nm]", ar).forEach(el => el.textContent = nameOf(el.dataset.nm));
+      $$("[data-rdel]", ar).forEach(b => b.addEventListener("click", async () => {
+        if (b.dataset.armed !== "1") {
+          b.dataset.armed = "1"; b.textContent = "Ain karanna aye click karanna";
+          setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "Report eka ain karanna"; } }, 4000);
+          return;
+        }
+        b.disabled = true;
+        const ref = S.db.doc("reports/" + b.dataset.rdel);
+        try {
+          const snap = await ref.get();
+          const prev = snap.exists ? JSON.parse(JSON.stringify(snap.data())) : null;
+          await ref.delete();
+          toast("Report eka ain kala", prev ? () => ref.set(prev) : null);
+        } catch (e) { toast(writeErrMsg(e)); b.disabled = false; }
+      }));
+    }
+  }
+  $("#approvalSwitch").addEventListener("click", async (e) => {
+    const sw = e.currentTarget;
+    const next = !S.config.requireApproval;
+    sw.disabled = true;
+    try {
+      // Turning approval on: approve the admin first so their own reports keep counting.
+      if (next && S.uid && !(S.roles[safeId(S.uid)] && S.roles[safeId(S.uid)].status === "approved")) await setStatus(S.uid, "approved");
+      await S.db.doc("config/settings").set(Object.assign({}, S.config, { requireApproval: next, by: S.uid, at: new Date().toISOString() }));
+      toast(next ? "Approval on kala. Aluth sellersla approve karanna one." : "Approval off kala. Hama sellerma ganan karanawa.");
+    } catch (err) { toast(adminErr(err)); }
+    finally { sw.disabled = false; }
+  });
+  $$("#sellerFilter button").forEach(b => b.addEventListener("click", () => {
+    S.sellerFilter = b.dataset.sf;
+    $$("#sellerFilter button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    renderAdmin();
+  }));
+  function showAdminAccess() {
+    $("#adminTab").hidden = !S.isAdmin;
+    $("#adminBody").hidden = !S.isAdmin;
+    $("#adminDenied").hidden = S.isAdmin;
+  }
+
+  // ---------- boot ----------
+  async function boot() {
+    const claude = window.claude;
+    if (!claude || !claude.use) { S.tried = true; setNote("Seller network ekata connect wenna bari una. Page eka Claude eke open karanna.", true); return; }
+    const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    S.tried = true; S.db = db;
+    S.user = user;
+    if (user) {
+      S.uid = await user.id(); S.canWrite = await user.can("data.write");
+      S.isOwner = await user.isOwner(); S.isAdmin = S.isOwner || await user.canEdit();
+    }
+    showAdminAccess();
+    if (!db) { setNote("Seller network ekata connect wenna sign in wela inna one.", true); renderMe(); return; }
+    S.ready = true;
+    setNote("");
+    subscribeRoles(); subscribeMe(); subscribeAdmin(); renderMe(); applyWriteState(); renderAdmin();
+    if (lastChecked) runCheck(lastChecked);
+  }
+  boot().catch(() => { S.tried = true; setNote("Seller network ekata connect wenna bari una. Page eka refresh karanna.", true); });
+})();
+</script>
