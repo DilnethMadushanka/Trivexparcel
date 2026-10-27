@@ -51,4 +51,4 @@ npm run build   # rebuild dist/hariyata.html
 
 ## Status
 
-v0.3 beta. Runs as a Claude artifact with a shared database. A standalone version (own domain, login, PayHere subscription billing, server-side enforcement of one record per seller) is the next step before a paid launch.
+v0.4 beta. Runs as a Claude artifact with a shared database. A standalone version (own domain, login, PayHere subscription billing, server-side enforcement of one record per seller) is the next step before a paid launch.
