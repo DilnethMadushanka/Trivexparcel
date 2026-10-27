@@ -1,493 +1,505 @@
 <title>Hariyata</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,500..900&family=Schibsted+Grotesk:wght@400;500;600;700&family=Abhaya+Libre:wght@800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: phone-first single column; the check result is a parcel slip with kraft tape and an inked rubber stamp. Bottom tab bar for thumb reach. Left-aligned throughout. */
+/* Layout: app shell. Desktop = left rail + main column; phone = top bar + bottom tab bar.
+   Principle: pure black and white, and ink density encodes risk:
+   outline = safe, hatched = confirm, solid = risk, dotted = no data. */
 :root {
-  --ground: #E6ECE7;      /* pale tea-leaf grey */
-  --surface: #FBFCFA;
-  --ink: #10241C;         /* green-black */
-  --soft: #55665D;
-  --rule: #CFD9D2;
-  --tea: #0F5B3E;         /* Ceylon tea green, brand */
-  --tea-ink: #FFFFFF;
-  --kraft: #C99B5C;       /* parcel tape */
-  --kraft-ink: #3A2A12;
-  --good: #1D7A3B;
-  --watch: #B06C08;
-  --risk: #C1272D;        /* postal red */
-  --new: #5E6B64;
-  --good-wash: #DDEFE2;
-  --watch-wash: #F6E9D2;
-  --risk-wash: #F7DEDD;
-  --new-wash: #E3E8E5;
-  --focus: #1F6FD1;
-  --f-stamp: "Anybody", "Arial Narrow", Impact, sans-serif;
-  --f-body: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
-  --f-si: "Abhaya Libre", "Noto Serif Sinhala", "Iskoola Pota", serif;
+  --bg: #FFFFFF;
+  --fg: #000000;
+  --soft: #6E6E6E;
+  --faint: #A3A3A3;
+  --rule: #E6E6E6;
+  --sunk: #F5F5F5;
+  --f-ui: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ground: #0A1410; --surface: #12201A; --ink: #E2ECE6; --soft: #9AAEA3; --rule: #23362D;
-    --tea: #4DBE89; --tea-ink: #04140D; --kraft: #B98C50; --kraft-ink: #1E1405;
-    --good: #52C77E; --watch: #E7A646; --risk: #F2666B; --new: #9AAEA3;
-    --good-wash: #12301F; --watch-wash: #2F230E; --risk-wash: #351618; --new-wash: #1A2A23;
-    --focus: #7DB2FF; color-scheme: dark;
-  }
+  :root:not([data-theme="light"]) { --bg: #000000; --fg: #FFFFFF; --soft: #8F8F8F; --faint: #5C5C5C; --rule: #222222; --sunk: #0E0E0E; color-scheme: dark; }
 }
-:root[data-theme="dark"] {
-  --ground: #0A1410; --surface: #12201A; --ink: #E2ECE6; --soft: #9AAEA3; --rule: #23362D;
-  --tea: #4DBE89; --tea-ink: #04140D; --kraft: #B98C50; --kraft-ink: #1E1405;
-  --good: #52C77E; --watch: #E7A646; --risk: #F2666B; --new: #9AAEA3;
-  --good-wash: #12301F; --watch-wash: #2F230E; --risk-wash: #351618; --new-wash: #1A2A23;
-  --focus: #7DB2FF; color-scheme: dark;
-}
+:root[data-theme="dark"] { --bg: #000000; --fg: #FFFFFF; --soft: #8F8F8F; --faint: #5C5C5C; --rule: #222222; --sunk: #0E0E0E; color-scheme: dark; }
+
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
-  background: var(--ground); color: var(--ink);
-  font-family: var(--f-body); font-size: 16px; line-height: 1.5;
+  background: var(--bg); color: var(--fg); font-family: var(--f-ui); font-size: 15px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; font-feature-settings: "ss01", "cv11";
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 0 calc(96px + env(safe-area-inset-bottom, 0px));
+  padding-block: 0 calc(92px + env(safe-area-inset-bottom, 0px));
 }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--ground); }
-.app { max-width: 540px; margin: 0 auto; display: grid; gap: 22px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
 button, input, textarea { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
-a { color: var(--tea); }
-p { margin: 0; }
-h2, h3 { margin: 0; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+a { color: inherit; text-underline-offset: 3px; }
+p, h1, h2, h3 { margin: 0; }
+.num, .tnum { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--f-mono); }
 
-/* Masthead */
-.mast { display: flex; align-items: center; gap: 12px; padding-top: 18px; }
-.mark {
-  width: 46px; height: 46px; border-radius: 12px; background: var(--tea); color: var(--tea-ink);
-  display: grid; place-items: center; font-family: var(--f-si); font-size: 25px; font-weight: 800; line-height: 1;
-  padding-top: 4px; flex: 0 0 auto;
-}
-.mast-text { display: grid; line-height: 1.15; min-width: 0; }
-.mast-text strong { font-family: var(--f-stamp); font-stretch: 112%; font-weight: 800; font-size: 22px; letter-spacing: -0.01em; }
-.mast-text span { font-size: 13px; color: var(--soft); }
-.beta { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--soft); border: 1px solid var(--rule); border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
+/* Verdict patterns */
+.v-safe   { --pat: var(--bg); --pat-fg: var(--fg); --edge: 1.5px solid var(--fg); }
+.v-confirm{ --pat: repeating-linear-gradient(-45deg, var(--fg) 0 1.5px, transparent 1.5px 7px); --pat-fg: var(--fg); --edge: 1.5px solid var(--fg); }
+.v-risk   { --pat: var(--fg); --pat-fg: var(--bg); --edge: 1.5px solid var(--fg); }
+.v-new    { --pat: var(--bg); --pat-fg: var(--soft); --edge: 1.5px dashed var(--faint); }
+.swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; background: var(--pat); border: var(--edge); flex: 0 0 auto; }
 
-#connNote { font-size: 14px; border-radius: 10px; padding: 10px 14px; background: var(--new-wash); }
-#connNote.warn { background: var(--watch-wash); }
+/* Shell */
+.shell { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); }
+.rail { display: none; }
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg);
+  display: flex; align-items: center; gap: 10px; padding-block: 14px; border-bottom: 1px solid var(--rule); }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--fg); color: var(--bg); display: grid; place-items: center; }
+.logo-mark svg { width: 18px; height: 18px; }
+.logo-word { font-weight: 700; font-size: 17px; letter-spacing: -0.02em; }
+.logo-by { font-size: 12px; color: var(--soft); }
+.status { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--soft); }
+.status i { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.status.live i { background: var(--fg); animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+main { min-width: 0; padding-block: 28px 40px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; max-width: 720px; width: 100%; }
+.view, .sec, .field, .cmd, .rbody { grid-template-columns: minmax(0, 1fr); }
 
-/* Views */
-.view { display: grid; gap: 18px; }
-.view-head { display: grid; gap: 6px; }
-.view-head h2 { font-family: var(--f-stamp); font-stretch: 90%; font-weight: 800; font-size: clamp(26px, 7vw, 32px); line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; }
-.view-head p { color: var(--soft); max-width: 58ch; }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); border-top: 1px solid var(--rule);
+  padding: 6px max(6px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px)); }
+.tabbar-in { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; max-width: 560px; margin: 0 auto; }
+.navlink { display: grid; justify-items: center; gap: 3px; padding: 6px 2px; font-size: 11px; font-weight: 500; color: var(--soft); text-decoration: none; border-radius: 10px; }
+.navlink svg { width: 22px; height: 22px; }
+.navlink[aria-current="page"] { color: var(--fg); }
+.navlink[aria-current="page"] svg { stroke-width: 2.2; }
 
-/* Forms */
-.form { display: grid; gap: 10px; }
-.label { font-weight: 600; font-size: 15px; }
-.phone-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
-.phone {
-  width: 100%; min-width: 0; background: var(--surface); border: 2px solid var(--rule); border-radius: 14px;
-  padding: 14px 16px; font-size: 24px; font-weight: 600; letter-spacing: .03em; font-variant-numeric: tabular-nums;
+@media (min-width: 900px) {
+  body { padding-bottom: 0; }
+  .shell { grid-template-columns: 232px minmax(0, 1fr); gap: 56px; }
+  .topbar, .tabbar { display: none; }
+  .rail { display: flex; flex-direction: column; gap: 28px; position: sticky; top: 0; height: 100vh; padding-block: 28px; border-right: 1px solid var(--rule); padding-right: 24px; }
+  .rail nav { display: grid; gap: 2px; }
+  .rail .navlink { grid-template-columns: 20px 1fr auto; justify-items: start; align-items: center; gap: 12px; font-size: 14px; padding: 9px 10px; }
+  .rail .navlink svg { width: 18px; height: 18px; }
+  .rail .navlink[aria-current="page"] { background: var(--sunk); }
+  .rail .navlink kbd { font-size: 11px; }
+  .rail-foot { margin-top: auto; display: grid; gap: 10px; font-size: 12px; color: var(--soft); }
+  .rail .status { margin-left: 0; }
+  main { padding-block: 56px 80px; }
 }
-.phone:focus { border-color: var(--tea); outline: none; }
-.phone::placeholder { color: var(--soft); opacity: .55; }
-textarea {
-  width: 100%; min-width: 0; min-height: 168px; resize: vertical; background: var(--surface);
-  border: 2px solid var(--rule); border-radius: 14px; padding: 14px 16px; font-size: 14px; line-height: 1.65;
-}
-textarea:focus, input[type=number]:focus { border-color: var(--tea); outline: none; }
-input[type=number] { width: 140px; background: var(--surface); border: 2px solid var(--rule); border-radius: 10px; padding: 10px 12px; font-variant-numeric: tabular-nums; font-weight: 600; }
-.go {
-  background: var(--tea); color: var(--tea-ink); border: 0; border-radius: 14px; padding: 0 20px;
-  font-weight: 700; font-size: 16px; cursor: pointer; min-height: 56px; white-space: nowrap;
-}
-.go:disabled { opacity: .5; cursor: progress; }
-.quiet { background: transparent; color: var(--ink); border: 2px solid var(--rule); border-radius: 12px; padding: 0 16px; min-height: 48px; font-weight: 600; cursor: pointer; }
-.btns { display: flex; gap: 8px; flex-wrap: wrap; }
-.btns .go { min-height: 50px; }
+kbd { font-family: var(--f-mono); font-size: 11px; color: var(--soft); border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; line-height: 18px; display: inline-block; min-width: 20px; text-align: center; background: var(--bg); }
+.desk { display: none; }
+@media (min-width: 900px) and (hover: hover) { .desk { display: inline-block; } }
+
+/* Notice */
+#connNote { font-size: 13px; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 10px; color: var(--soft); }
+#connNote.warn { color: var(--fg); border-color: var(--fg); }
+
+/* Headings */
+.head { display: grid; gap: 10px; }
+.head h1 { font-size: clamp(34px, 8vw, 56px); font-weight: 700; letter-spacing: -0.045em; line-height: .98; text-wrap: balance; }
+.head p { color: var(--soft); font-size: 16px; max-width: 54ch; }
+.view { display: grid; gap: 28px; }
+.sec { display: grid; gap: 12px; }
+.sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.sec-h h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.sec-h .aside { font-size: 13px; color: var(--soft); }
+
+/* Command input */
+.cmd { display: grid; gap: 10px; }
+.cmd-box { position: relative; display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--fg); border-radius: 16px; padding: 6px 6px 6px 18px; background: var(--bg); transition: box-shadow .2s var(--ease); }
+.cmd-box:focus-within { box-shadow: 0 0 0 5px var(--sunk); }
+.cmd-box .cc { font-size: 15px; color: var(--soft); font-weight: 500; flex: 0 0 auto; }
+.cmd-input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 12px 0;
+  font-size: clamp(24px, 6.4vw, 34px); font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.cmd-input::placeholder { color: var(--faint); }
+.go { flex: 0 0 auto; border: 0; background: var(--fg); color: var(--bg); border-radius: 11px; min-height: 52px; padding: 0 20px; font-weight: 600; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; }
+.go kbd { color: var(--bg); border-color: color-mix(in srgb, var(--bg) 40%, transparent); background: transparent; }
+.go:disabled { opacity: .55; cursor: progress; }
+.cmd-meta { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--soft); }
+.err { font-size: 14px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.err::before { content: ""; width: 8px; height: 8px; background: var(--fg); border-radius: 2px; flex: 0 0 auto; }
+.scan { position: absolute; left: 14px; right: 14px; bottom: -1.5px; height: 2px; overflow: hidden; border-radius: 2px; opacity: 0; }
+.scan::after { content: ""; position: absolute; inset: 0; width: 30%; background: var(--fg); animation: scan 1s var(--ease) infinite; }
+.busy .scan { opacity: 1; }
+@keyframes scan { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+
+/* Result */
+.result { border: 1.5px solid var(--fg); border-radius: 20px; overflow: hidden; display: grid; background: var(--bg); }
+.verdict { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; align-items: end; padding: 22px 22px 20px;
+  background: var(--pat); color: var(--pat-fg); border-bottom: 1.5px solid var(--fg); position: relative; }
+.v-confirm .verdict { background: var(--bg); }
+.v-confirm .verdict::before { content: ""; position: absolute; inset: 0; background: var(--pat); opacity: .14; pointer-events: none; }
+.v-new .verdict { border-bottom-style: dashed; }
+.verdict > * { position: relative; }
+.verdict-word { font-size: clamp(56px, 17vw, 112px); font-weight: 800; letter-spacing: -0.06em; line-height: .82; grid-column: 1 / -1; }
+.verdict-word span { display: inline-block; }
+.verdict-line { font-size: 15px; font-weight: 500; }
+.verdict-num { font-size: 14px; opacity: .8; font-variant-numeric: tabular-nums; text-align: right; }
+.reveal .verdict-word span { animation: rise .6s var(--ease) both; }
+@keyframes rise { from { transform: translateY(40%); opacity: 0; filter: blur(6px); } to { transform: none; opacity: 1; filter: none; } }
+
+.rbody { padding: 22px; display: grid; gap: 22px; }
+.score-row { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: end; }
+.score-big { font-size: 64px; font-weight: 700; letter-spacing: -0.05em; line-height: .85; font-variant-numeric: tabular-nums; }
+.score-big small { font-size: 18px; color: var(--soft); letter-spacing: 0; font-weight: 500; margin-left: 2px; }
+.score-label { font-size: 13px; color: var(--soft); }
+.meter { display: grid; gap: 6px; min-width: 0; }
+.segs { display: grid; grid-template-columns: repeat(50, 1fr); gap: 2px; height: 28px; }
+.segs i { background: var(--rule); border-radius: 1px; transition: background .25s; }
+.segs i.on { background: var(--fg); }
+.scale { position: relative; height: 16px; font-size: 11px; color: var(--soft); font-variant-numeric: tabular-nums; font-family: var(--f-mono); }
+.scale span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.scale span::before { content: ""; position: absolute; left: 50%; top: -8px; width: 1px; height: 6px; background: var(--soft); }
+.scale span.s0 { transform: none; } .scale span.s0::before { left: 0; }
+.scale span.s100 { transform: translateX(-100%); } .scale span.s100::before { left: auto; right: 0; }
+
+.breakdown { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.breakdown div { padding: 14px 0; display: grid; gap: 2px; }
+.breakdown div + div { border-left: 1px solid var(--rule); padding-left: 16px; }
+.breakdown b { font-size: 28px; font-weight: 650; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.breakdown span { font-size: 13px; color: var(--soft); }
+.advice { font-size: 16px; line-height: 1.5; max-width: 60ch; }
+.advice strong { font-weight: 650; }
+.sub { font-size: 13px; color: var(--soft); }
+
+/* Report controls */
+.seg3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1.5px solid var(--fg); border-radius: 13px; overflow: hidden; }
+.seg3 button { border: 0; background: var(--bg); min-height: 56px; padding: 8px 6px; font-weight: 600; font-size: 14px; cursor: pointer; display: grid; justify-items: center; gap: 3px; align-content: center; transition: background .15s, color .15s; }
+.seg3 button + button { border-left: 1.5px solid var(--fg); }
+.seg3 button svg { width: 18px; height: 18px; }
+.seg3 button:hover:not(:disabled) { background: var(--sunk); }
+.seg3 button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg3 button:disabled { color: var(--faint); cursor: not-allowed; }
+.seg3 kbd { font-size: 10px; line-height: 15px; }
+.seg3 button[aria-pressed="true"] kbd { color: var(--bg); background: transparent; }
+
+/* Generic controls */
+.btn { border: 1.5px solid var(--fg); background: var(--fg); color: var(--bg); border-radius: 11px; min-height: 48px; padding: 0 18px; font-weight: 600; cursor: pointer; }
+.btn.ghost { background: var(--bg); color: var(--fg); border-color: var(--rule); }
+.btn.ghost:hover { border-color: var(--fg); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.chipbtn { border: 1px solid var(--rule); background: var(--bg); border-radius: 8px; min-height: 32px; padding: 0 10px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.chipbtn:hover:not(:disabled) { border-color: var(--fg); }
+.chipbtn:disabled { color: var(--faint); cursor: not-allowed; }
+.chipbtn[data-armed="1"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.field { display: grid; gap: 8px; }
+.field > label, .field > .lbl { font-size: 13px; font-weight: 600; }
+.input { width: 100%; min-width: 0; border: 1.5px solid var(--rule); border-radius: 12px; background: var(--bg); padding: 12px 14px; font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.input:focus { outline: none; border-color: var(--fg); }
+textarea.input { min-height: 180px; resize: vertical; font-family: var(--f-mono); font-size: 13px; line-height: 1.7; font-weight: 400; }
 .hint { font-size: 13px; color: var(--soft); }
-.err { color: var(--risk); font-size: 14px; font-weight: 600; }
 
-/* Parcel slip */
-.slip {
-  position: relative; background: var(--surface); border-radius: 6px 6px 16px 16px;
-  box-shadow: 0 1px 0 var(--rule), 0 14px 30px -18px rgba(16, 36, 28, .45);
-  display: grid; overflow: hidden;
-}
-.tape {
-  height: 22px; background: var(--kraft);
-  background-image: repeating-linear-gradient(90deg, transparent 0 18px, rgba(0,0,0,.06) 18px 19px);
-}
-.slip-main { padding: 18px 18px 6px; display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; }
-.slip-num { font-size: 26px; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; line-height: 1.15; }
-.slip-sub { font-size: 13px; color: var(--soft); grid-column: 1; }
+/* Verdict tag */
+.tag { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; white-space: nowrap; }
 
-.stamp {
-  grid-row: 1 / span 2; grid-column: 2;
-  font-family: var(--f-stamp); font-stretch: 58%; font-weight: 900; text-transform: uppercase;
-  font-size: 30px; letter-spacing: .05em; line-height: 1; color: var(--c);
-  border: 4px solid var(--c); border-radius: 8px; padding: 8px 12px 6px; text-align: center;
-  transform: rotate(-8deg); white-space: nowrap;
-  box-shadow: inset 0 0 0 2px var(--surface), inset 0 0 0 4px var(--c);
-  -webkit-mask-image: var(--grain); mask-image: var(--grain); -webkit-mask-size: 160px; mask-size: 160px;
-}
-.stamp small { display: block; font-family: var(--f-body); font-size: 11px; font-weight: 700; letter-spacing: .02em; text-transform: none; margin-top: 4px; }
-.stamp.thunk { animation: thunk .42s cubic-bezier(.2, .9, .3, 1.3) both; }
-@keyframes thunk {
-  0% { transform: scale(1.9) rotate(-16deg); opacity: 0; }
-  55% { transform: scale(.94) rotate(-7deg); opacity: 1; }
-  100% { transform: scale(1) rotate(-8deg); opacity: 1; }
-}
-.slip.jolt { animation: jolt .3s .2s ease-out; }
-@keyframes jolt { 0%,100% { transform: none; } 40% { transform: translateY(2px); } }
-
-.lv-good { --c: var(--good); --wash: var(--good-wash); }
-.lv-watch { --c: var(--watch); --wash: var(--watch-wash); }
-.lv-risk { --c: var(--risk); --wash: var(--risk-wash); }
-.lv-new { --c: var(--new); --wash: var(--new-wash); }
-
-/* Ruler: zones are the real thresholds (45 and 75) */
-.ruler-wrap { padding: 8px 18px 4px; display: grid; gap: 6px; }
-.ruler-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; }
-.ruler-head b { font-size: 20px; font-variant-numeric: tabular-nums; color: var(--c); }
-.ruler { position: relative; height: 14px; border-radius: 99px; overflow: visible;
-  background: linear-gradient(90deg, var(--risk-wash) 0 45%, var(--watch-wash) 45% 75%, var(--good-wash) 75% 100%);
-  border: 1px solid var(--rule); }
-.ruler i { position: absolute; top: -5px; width: 6px; height: 22px; border-radius: 3px; background: var(--c);
-  left: calc(var(--x, 0) * 1% - 3px); transition: left .6s cubic-bezier(.2,.8,.2,1); box-shadow: 0 0 0 2px var(--surface); }
-.ticks { position: relative; height: 16px; font-size: 11px; color: var(--soft); font-variant-numeric: tabular-nums; }
-.ticks span { position: absolute; transform: translateX(-50%); }
-.ticks span:first-child { transform: none; } .ticks span:last-child { transform: translateX(-100%); }
-
-.counts { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 8px 18px 0; font-size: 14px; color: var(--soft); }
-.counts b { color: var(--ink); font-size: 18px; font-variant-numeric: tabular-nums; margin-right: 4px; }
-.advice { margin: 14px 18px 0; background: var(--wash); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
-.advice strong { color: var(--c); }
-
-.tear { margin-top: 18px; height: 12px;
-  background: radial-gradient(circle at 6px 6px, var(--ground) 5px, transparent 5.5px) -6px 0 / 18px 12px repeat-x; }
-.slip-report { padding: 6px 18px 18px; display: grid; gap: 10px; }
-.slip-report h3 { font-size: 15px; font-weight: 700; }
-
-.outcomes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.oc {
-  border: 2px solid var(--rule); background: var(--surface); border-radius: 12px; padding: 10px 4px;
-  cursor: pointer; font-weight: 700; font-size: 14px; min-height: 64px; display: grid; gap: 4px; justify-items: center; align-content: center;
-}
-.oc svg { width: 22px; height: 22px; }
-.oc.del svg { color: var(--good); } .oc.rej svg { color: var(--watch); } .oc.fake svg { color: var(--risk); }
-.oc[aria-pressed="true"] { border-color: var(--ink); }
-.oc:disabled { opacity: .45; cursor: not-allowed; }
-.oc:not(:disabled):active { transform: translateY(1px); }
-
-/* Lists */
+/* Tables / lists */
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th { text-align: left; font-weight: 500; font-size: 12px; color: var(--soft); padding: 0 12px 10px 0; border-bottom: 1px solid var(--fg); }
+.table td { padding: 13px 12px 13px 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.table td.r, .table th.r { text-align: right; padding-right: 0; }
+.table .n { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table .acts { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+.tablewrap { overflow-x: auto; }
 .list { display: grid; }
-.item { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--rule); }
-.item:last-child { border-bottom: 0; }
-.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px var(--wash); }
-.item .n { font-weight: 700; font-variant-numeric: tabular-nums; }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; padding: 14px 0; border-bottom: 1px solid var(--rule); align-items: center; }
+.item:first-child { border-top: 1px solid var(--fg); }
+.item .n { font-weight: 600; font-variant-numeric: tabular-nums; }
 .item .meta { font-size: 13px; color: var(--soft); }
-.item .verdict { font-size: 13px; font-weight: 700; color: var(--c); }
-.item .acts { grid-column: 2 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
-.tiny { border: 1px solid var(--rule); background: var(--surface); border-radius: 8px; padding: 4px 10px; min-height: 34px; font-size: 13px; font-weight: 600; cursor: pointer; }
-.tiny:disabled { opacity: .45; }
-.tiny.danger[data-armed="1"] { border-color: var(--risk); color: var(--risk); }
+.item .acts { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.only-wide { display: none; }
+@media (min-width: 640px) { .only-wide { display: block; } .only-narrow { display: none; } }
+.empty { border: 1.5px dashed var(--rule); border-radius: 14px; padding: 22px; color: var(--soft); font-size: 14px; display: grid; gap: 4px; }
+.empty strong { color: var(--fg); font-weight: 600; }
 
-.section { display: grid; gap: 6px; }
-.section h3 { font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-.panel { background: var(--surface); border-radius: 16px; padding: 16px; display: grid; gap: 12px; }
+/* Distribution bar */
+.dist { display: flex; height: 36px; border: 1.5px solid var(--fg); border-radius: 10px; overflow: hidden; }
+.dist span { background: var(--pat); }
+.dist span + span { border-left: 1.5px solid var(--fg); }
+.dist .v-confirm { background: var(--bg); background-image: var(--pat); }
+.dist .v-new { background: radial-gradient(var(--soft) 1px, transparent 1.4px) 0 0 / 6px 6px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend b { font-variant-numeric: tabular-nums; }
 
-/* Bulk summary bar */
-.mix { display: flex; height: 12px; border-radius: 99px; overflow: hidden; background: var(--rule); }
-.mix span { background: var(--c); }
-.mix-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
-.mix-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.mix-legend i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
-.mix-legend b { font-variant-numeric: tabular-nums; }
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--fg); }
+.stat { padding: 14px 14px 14px 0; display: grid; gap: 2px; }
+.stat + .stat { padding-left: 14px; border-left: 1px solid var(--rule); }
+.stat b { font-size: 32px; font-weight: 650; letter-spacing: -0.04em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--soft); }
+@media (max-width: 520px) { .stats { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { padding-left: 0; border-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid var(--rule); } }
+.hero-fig { display: grid; gap: 4px; }
+.hero-fig b { font-size: clamp(44px, 12vw, 72px); font-weight: 700; letter-spacing: -0.05em; line-height: .95; font-variant-numeric: tabular-nums; }
+.hero-fig span { font-size: 14px; color: var(--soft); }
+.inline-fee { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--soft); }
+.inline-fee input { width: 110px; border: 1.5px solid var(--rule); border-radius: 9px; padding: 7px 10px; background: var(--bg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.inline-fee input:focus { outline: none; border-color: var(--fg); }
 
-/* Records */
-.loss { display: grid; gap: 2px; }
-.loss b { font-family: var(--f-stamp); font-stretch: 80%; font-weight: 850; font-size: 40px; line-height: 1.05; font-variant-numeric: tabular-nums; color: var(--risk); }
-.tallies { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; color: var(--soft); }
-.tallies b { color: var(--ink); font-size: 18px; font-variant-numeric: tabular-nums; margin-right: 4px; }
-.fee-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; }
-.empty { color: var(--soft); font-size: 15px; padding: 18px; border: 2px dashed var(--rule); border-radius: 14px; }
+/* Role pills */
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; border-radius: 99px; padding: 3px 10px; white-space: nowrap; border: 1.5px solid var(--fg); }
+.pill.p-admin { background: var(--fg); color: var(--bg); }
+.pill.p-pending { border-style: dashed; }
+.pill.p-blocked { background: repeating-linear-gradient(-45deg, var(--fg) 0 1.5px, transparent 1.5px 5px); }
+.pill.p-blocked span { background: var(--bg); padding: 0 4px; border-radius: 4px; }
+.who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.who img { width: 28px; height: 28px; border-radius: 50%; filter: grayscale(1); flex: 0 0 auto; }
+.who .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.switch-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; padding: 16px 0; border-top: 1px solid var(--fg); border-bottom: 1px solid var(--rule); }
+.switch-row h3 { font-size: 15px; font-weight: 600; }
+.switch-row p { font-size: 13px; color: var(--soft); max-width: 52ch; }
+.switch { position: relative; width: 50px; height: 30px; border-radius: 99px; border: 1.5px solid var(--fg); background: var(--bg); cursor: pointer; padding: 0; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 21px; height: 21px; border-radius: 50%; background: var(--fg); transition: transform .25s var(--ease); }
+.switch[aria-checked="true"] { background: var(--fg); }
+.switch[aria-checked="true"]::after { background: var(--bg); transform: translateX(20px); }
+.switch:disabled { opacity: .5; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filters button { border: 1px solid var(--rule); background: var(--bg); border-radius: 99px; min-height: 32px; padding: 0 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 
 /* Info */
-.steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; counter-reset: s; }
-.steps li { counter-increment: s; display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; }
-.steps li::before { content: counter(s); width: 30px; height: 30px; border-radius: 50%; background: var(--tea); color: var(--tea-ink); display: grid; place-items: center; font-weight: 700; font-size: 14px; }
-.legend { display: grid; gap: 12px; }
-.legend div { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: center; font-size: 15px; }
-.mini-stamp { font-family: var(--f-stamp); font-stretch: 58%; font-weight: 900; text-transform: uppercase; color: var(--c); border: 3px solid var(--c); border-radius: 6px; padding: 3px 6px 2px; text-align: center; font-size: 17px; letter-spacing: .04em; transform: rotate(-6deg); -webkit-mask-image: var(--grain); mask-image: var(--grain); -webkit-mask-size: 120px; mask-size: 120px; }
-.plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.plan { border: 2px solid var(--rule); border-radius: 12px; padding: 12px; display: grid; gap: 2px; align-content: start; font-size: 13px; color: var(--soft); }
-.plan strong { color: var(--ink); font-size: 14px; }
-.plan b { color: var(--ink); font-size: 18px; font-variant-numeric: tabular-nums; }
-.plan.pick { border-color: var(--tea); }
-.fine { font-size: 13px; color: var(--soft); }
-
-/* Bottom tab bar */
-.tabbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 8;
-  background: var(--surface); border-top: 1px solid var(--rule);
-  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
-}
-.tabbar-in { max-width: 540px; margin: 0 auto; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
-.tabbar a {
-  display: grid; justify-items: center; gap: 2px; padding: 6px 2px; text-decoration: none;
-  color: var(--soft); font-size: 12px; font-weight: 600; border-radius: 10px;
-}
-.tabbar a svg { width: 24px; height: 24px; }
-.tabbar a[aria-current="page"] { color: var(--tea); }
-.tabbar a[aria-current="page"] svg { stroke-width: 2.4; }
-
-/* Admin */
-.role-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--c); background: var(--wash); border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
-.st-approved { --c: var(--good); --wash: var(--good-wash); }
-.st-pending { --c: var(--watch); --wash: var(--watch-wash); }
-.st-blocked { --c: var(--risk); --wash: var(--risk-wash); }
-.st-admin { --c: var(--tea); --wash: var(--new-wash); }
-.st-new { --c: var(--new); --wash: var(--new-wash); }
-.figs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.fig { display: grid; gap: 0; }
-.fig b { font-family: var(--f-stamp); font-stretch: 85%; font-weight: 850; font-size: 30px; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.fig span { font-size: 13px; color: var(--soft); }
-.switch-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
-.switch-row p { font-size: 14px; color: var(--soft); }
-.switch { position: relative; width: 52px; height: 30px; border-radius: 99px; border: 0; background: var(--rule); cursor: pointer; padding: 0; flex: 0 0 auto; }
-.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--surface); transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
-.switch[aria-checked="true"] { background: var(--tea); }
-.switch[aria-checked="true"]::after { left: 25px; }
-.switch:disabled { opacity: .5; }
-.filter { display: flex; gap: 6px; flex-wrap: wrap; }
-.filter button { border: 1px solid var(--rule); background: var(--surface); border-radius: 99px; padding: 5px 12px; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 34px; }
-.filter button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
-.who { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.who img { width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto; }
-.who .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.item.person { grid-template-columns: 1fr auto; }
-.item.person .acts { grid-column: 1 / -1; }
-.me-role { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
-@media (max-width: 400px) { .figs { grid-template-columns: repeat(2, 1fr); } }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--fg); counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+.steps li::before { content: counter(s); font-size: 28px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+.steps b { font-weight: 600; }
+.vlegend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.vcard { border-radius: 14px; border: var(--edge); overflow: hidden; display: grid; }
+.vcard .top { background: var(--pat); color: var(--pat-fg); padding: 14px; font-size: 26px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; border-bottom: var(--edge); }
+.vcard.v-confirm .top { background: var(--bg); position: relative; }
+.vcard.v-confirm .top::before { content: ""; position: absolute; inset: 0; background: var(--pat); opacity: .14; }
+.vcard.v-confirm .top span { position: relative; }
+.vcard p { padding: 12px 14px 14px; font-size: 13px; color: var(--soft); }
+.vcard p b { color: var(--fg); font-weight: 600; }
+.plans { display: grid; grid-template-columns: repeat(3, 1fr); border: 1.5px solid var(--fg); border-radius: 16px; overflow: hidden; }
+.plan { padding: 16px; display: grid; gap: 4px; align-content: start; font-size: 13px; color: var(--soft); }
+.plan + .plan { border-left: 1.5px solid var(--fg); }
+.plan h3 { font-size: 14px; color: var(--fg); font-weight: 600; }
+.plan b { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; color: var(--fg); font-variant-numeric: tabular-nums; }
+.plan.pick { background: var(--fg); color: color-mix(in srgb, var(--bg) 70%, var(--fg)); }
+.plan.pick h3, .plan.pick b { color: var(--bg); }
+.prose { display: grid; gap: 10px; font-size: 15px; max-width: 62ch; }
+.prose p { color: var(--soft); } .prose b { color: var(--fg); font-weight: 600; }
+@media (max-width: 560px) { .plans { grid-template-columns: 1fr; } .plan + .plan { border-left: 0; border-top: 1.5px solid var(--fg); } .vlegend { grid-template-columns: 1fr; } }
+footer.fine { font-size: 12px; color: var(--soft); }
 
 /* Toast */
-.toast {
-  position: fixed; left: 50%; transform: translateX(-50%); z-index: 20;
-  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
-  background: var(--ink); color: var(--surface); border-radius: 14px; padding: 10px 10px 10px 16px;
-  display: flex; gap: 12px; align-items: center; width: max-content; max-width: calc(100% - 32px);
-  box-shadow: 0 10px 30px -10px rgba(0,0,0,.4); font-size: 14px;
-}
-.toast button { background: transparent; border: 1px solid currentColor; color: inherit; border-radius: 8px; padding: 6px 12px; font-weight: 700; cursor: pointer; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(86px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  background: var(--fg); color: var(--bg); border-radius: 14px; padding: 10px 10px 10px 16px; display: flex; gap: 14px; align-items: center;
+  width: max-content; max-width: calc(100% - 32px); font-size: 14px; font-weight: 500; box-shadow: 0 18px 40px -16px rgba(0,0,0,.5); }
+.toast button { border: 1px solid color-mix(in srgb, var(--bg) 45%, transparent); background: transparent; color: inherit; border-radius: 8px; padding: 6px 12px; font-weight: 600; cursor: pointer; }
+@media (min-width: 900px) { .toast { bottom: 28px; } }
 
-@media (max-width: 400px) {
-  .phone-row { grid-template-columns: 1fr; }
-  .go { min-height: 52px; }
-  .plans { grid-template-columns: 1fr; }
-  .stamp { font-size: 25px; padding: 7px 9px 5px; }
-  .slip-num { font-size: 22px; }
+@media (max-width: 420px) {
+  .cmd-box { padding-left: 14px; }
+  .go { padding: 0 16px; }
+  .score-big { font-size: 52px; }
+  .breakdown b { font-size: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .stamp.thunk, .slip.jolt { animation: none; }
-  .ruler i { transition: none; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 </style>
 
-<div class="app">
-  <header class="mast">
-    <div class="mark" lang="si" aria-hidden="true">හ</div>
-    <div class="mast-text"><strong id="appName">Hariyata</strong><span>COD parcel check, Trivex IT</span></div>
-    <span class="beta">Beta</span>
-  </header>
+<div class="shell">
+  <aside class="rail" aria-label="Sidebar">
+    <a class="logo" href="#check"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span>
+      <span style="display:grid;line-height:1.2"><span class="logo-word">Hariyata</span><span class="logo-by">by Trivex IT</span></span></a>
+    <nav id="railNav"></nav>
+    <div class="rail-foot">
+      <span class="status" data-status><i></i><span>Connecting</span></span>
+      <span>Beta v0.3</span>
+    </div>
+  </aside>
 
-  <div id="connNote" hidden></div>
+  <div style="min-width:0;display:grid;grid-template-columns:minmax(0,1fr)">
+    <header class="topbar">
+      <a class="logo" href="#check"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span><span class="logo-word">Hariyata</span></a>
+      <span class="status" data-status><i></i><span>Connecting</span></span>
+    </header>
 
-  <!-- CHECK -->
-  <section class="view" data-view="check">
-    <div class="view-head">
-      <h2>Parcel eka yawanna kalin number eka balanna</h2>
-      <p>Customer kalin COD parcels baragaththada, reject karada kiyala anith sellersla report karapu data walin pennanawa.</p>
-    </div>
-    <form id="checkForm" class="form" novalidate>
-      <label class="label" for="checkInput">Customer ge phone number</label>
-      <div class="phone-row">
-        <input id="checkInput" class="phone" type="tel" inputmode="tel" autocomplete="off" placeholder="077 123 4567">
-        <button class="go" id="checkBtn" type="submit">Check karanna</button>
-      </div>
-      <p class="hint">07X, +94, 94 kohoma gahuwath hari.</p>
-      <p class="err" id="checkErr" hidden></p>
-    </form>
-    <div id="checkResult"></div>
-    <div class="section" id="historyBox" hidden>
-      <h3>Langadi check kala ewa <button class="tiny" id="clearHistory" type="button">Clear</button></h3>
-      <div class="list" id="historyList"></div>
-      <p class="fine">Me list eka oyage phone eke witharai thiyenne.</p>
-    </div>
-  </section>
+    <main>
+      <div id="connNote" hidden></div>
 
-  <!-- BULK -->
-  <section class="view" data-view="bulk" hidden>
-    <div class="view-head">
-      <h2>Order list ekama ekaparin check karanna</h2>
-      <p>WhatsApp, Facebook, Excel kohen hari order list eka copy karala paste karanna. Numbers okkoma auto hoyagannawa.</p>
-    </div>
-    <form id="bulkForm" class="form" novalidate>
-      <label class="label" for="bulkInput">Order list</label>
-      <textarea id="bulkInput" spellcheck="false" placeholder="Order 1, Nimal, Kandy, 077 123 4567, Rs. 2500&#10;Order 2, Kumari, Galle, +94 71 234 5678"></textarea>
-      <p class="hint" id="bulkFound">Ekaparakata numbers 90 wenakam.</p>
-      <div class="btns">
-        <button class="go" id="bulkBtn" type="submit">Okkoma check karanna</button>
-        <button class="quiet" id="bulkSample" type="button">Example list ekak danna</button>
-      </div>
-      <p class="err" id="bulkErr" hidden></p>
-    </form>
-    <div id="bulkResult"></div>
-  </section>
-
-  <!-- REPORT -->
-  <section class="view" data-view="report" hidden>
-    <div class="view-head">
-      <h2>Parcel eka mokada une?</h2>
-      <p>Oya danna hama result ekakma anith sellersla bera ganna udaw wenawa. Ek number ekata oyage record ekai, aye report kalama eka update wenawa.</p>
-    </div>
-    <form id="reportForm" class="form" novalidate>
-      <label class="label" for="reportInput">Customer ge phone number</label>
-      <input id="reportInput" class="phone" type="tel" inputmode="tel" autocomplete="off" placeholder="077 123 4567">
-      <span class="label" id="ocLabel">Result eka</span>
-      <div class="outcomes" id="reportChoices" role="group" aria-labelledby="ocLabel"></div>
-      <p class="hint"><b>Reject</b>: parcel eka gaththe na, nathnam call ekata answer kale na. <b>Fake</b>: boru nama, boru address, nathnam order ekak dapu bawa piligannne na.</p>
-      <div class="btns"><button class="go" id="reportBtn" type="submit" disabled>Report karanna</button></div>
-      <p class="err" id="reportErr" hidden></p>
-    </form>
-  </section>
-
-  <!-- RECORDS -->
-  <section class="view" data-view="me" hidden>
-    <div class="view-head">
-      <h2>Mage records</h2>
-      <p>Oya report karapu parcels saha reject walin aathi una padu.</p>
-    </div>
-    <div class="me-role" id="meRole"></div>
-    <div class="panel">
-      <div class="loss"><span class="hint">Reject saha fake walin courier gaana padu</span><b id="meLoss">Rs. 0</b></div>
-      <div class="tallies" id="meSummary">
-        <span><b data-k="total">0</b>reports</span>
-        <span><b data-k="del">0</b>delivered</span>
-        <span><b data-k="rej">0</b>reject</span>
-        <span><b data-k="fake">0</b>fake</span>
-      </div>
-      <div class="fee-row"><label for="feeInput">Ek parcel ekakata courier gaana Rs.</label><input id="feeInput" type="number" min="0" step="10" value="450" inputmode="numeric"></div>
-      <p class="fine">Return walata yana courier gaana witharai ganan karanne. Packing, stock hira wela thiyena kaale ekathu karanne na.</p>
-    </div>
-    <div class="section">
-      <h3>Oyage reports</h3>
-      <div class="list" id="meList"></div>
-    </div>
-  </section>
-
-  <!-- ADMIN -->
-  <section class="view" data-view="admin" hidden>
-    <div class="view-head">
-      <h2>Admin panel</h2>
-      <p>Sellersla approve karanna, block karanna, waradi reports ain karanna.</p>
-    </div>
-    <div id="adminDenied" class="empty" hidden>Me page eka admins la ta witharai. Admin kenek wenna artifact owner gen Editor access illanna.</div>
-    <div id="adminBody" hidden>
-      <div class="view" style="gap:18px">
-        <div class="panel">
-          <div class="figs" id="adminFigs">
-            <div class="fig"><b data-f="reports">0</b><span>Reports</span></div>
-            <div class="fig"><b data-f="sellers">0</b><span>Sellers</span></div>
-            <div class="fig"><b data-f="pending">0</b><span>Approve karanna</span></div>
-            <div class="fig"><b data-f="blocked">0</b><span>Blocked</span></div>
-          </div>
+      <!-- CHECK -->
+      <section class="view" data-view="check">
+        <div class="head">
+          <h1>Check before you ship COD.</h1>
+          <p>See how this customer handled cash-on-delivery parcels from other sellers, before you pack anything.</p>
         </div>
-        <div class="panel">
+        <form id="checkForm" class="cmd" novalidate>
+          <label for="checkInput" class="hint">Customer phone number</label>
+          <div class="cmd-box" id="cmdBox">
+            <span class="cc" aria-hidden="true">LK</span>
+            <input id="checkInput" class="cmd-input" size="1" type="tel" inputmode="tel" autocomplete="off" placeholder="077 123 4567">
+            <button class="go" id="checkBtn" type="submit">Check <kbd class="desk">↵</kbd></button>
+            <span class="scan" aria-hidden="true"></span>
+          </div>
+          <div class="cmd-meta"><span>Any format works: 07X, +94, 94, with spaces or dashes.</span><span class="desk">Press <kbd>/</kbd> to focus</span></div>
+          <p class="err" id="checkErr" hidden></p>
+        </form>
+        <div id="checkResult"></div>
+        <div class="sec" id="historyBox" hidden>
+          <div class="sec-h"><h2>Recent checks</h2><button class="chipbtn" id="clearHistory" type="button">Clear</button></div>
+          <div class="list" id="historyList"></div>
+          <p class="hint">Saved only on this device.</p>
+        </div>
+      </section>
+
+      <!-- BULK -->
+      <section class="view" data-view="bulk" hidden>
+        <div class="head">
+          <h1>Check a whole order list.</h1>
+          <p>Paste orders from WhatsApp, Facebook or Excel. Every Sri Lankan number is picked out and checked at once, riskiest first.</p>
+        </div>
+        <form id="bulkForm" class="field" novalidate>
+          <label for="bulkInput">Order list</label>
+          <textarea id="bulkInput" class="input" spellcheck="false" placeholder="Order #1041, Nimal, Kandy, 077 123 4567, Rs. 2,450&#10;Order #1042, Kumari, Galle, +94 71 234 5678"></textarea>
+          <div class="cmd-meta"><span id="bulkFound">Up to 90 numbers at a time.</span></div>
+          <div class="row">
+            <button class="btn" id="bulkBtn" type="submit">Check all</button>
+            <button class="btn ghost" id="bulkSample" type="button">Paste an example list</button>
+          </div>
+          <p class="err" id="bulkErr" hidden></p>
+        </form>
+        <div id="bulkResult"></div>
+      </section>
+
+      <!-- REPORT -->
+      <section class="view" data-view="report" hidden>
+        <div class="head">
+          <h1>What happened to the parcel?</h1>
+          <p>Every result you report protects other sellers. You keep one record per number; reporting again updates it.</p>
+        </div>
+        <form id="reportForm" class="view" style="gap:20px" novalidate>
+          <div class="field">
+            <label for="reportInput">Customer phone number</label>
+            <input id="reportInput" class="input" type="tel" inputmode="tel" autocomplete="off" placeholder="077 123 4567" style="font-size:22px;font-weight:600">
+          </div>
+          <div class="field">
+            <span class="lbl" id="ocLabel">Outcome</span>
+            <div class="seg3" id="reportChoices" role="group" aria-labelledby="ocLabel"></div>
+            <p class="hint"><b>Rejected</b>: refused the parcel or never answered the courier. <b>Fake</b>: false name or address, or denies ordering.</p>
+          </div>
+          <div class="row"><button class="btn" id="reportBtn" type="submit" disabled>Save report</button></div>
+          <p class="err" id="reportErr" hidden></p>
+        </form>
+      </section>
+
+      <!-- RECORDS -->
+      <section class="view" data-view="me" hidden>
+        <div class="head">
+          <h1>Your records.</h1>
+          <p>Parcels you have reported, and the courier fees lost to returns.</p>
+        </div>
+        <div class="row" id="meRole"></div>
+        <div class="hero-fig"><b id="meLoss">Rs. 0</b><span>Courier fees lost to rejected and fake orders</span></div>
+        <div class="inline-fee"><label for="feeInput">Courier fee per parcel, Rs.</label><input id="feeInput" type="number" min="0" step="10" value="450" inputmode="numeric"></div>
+        <div class="stats" id="meSummary">
+          <div class="stat"><b data-k="total">0</b><span>Numbers reported</span></div>
+          <div class="stat"><b data-k="del">0</b><span>Delivered</span></div>
+          <div class="stat"><b data-k="rej">0</b><span>Rejected</span></div>
+          <div class="stat"><b data-k="fake">0</b><span>Fake</span></div>
+        </div>
+        <div class="sec">
+          <div class="sec-h"><h2>Your reports</h2></div>
+          <div id="meList"></div>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section class="view" data-view="admin" hidden>
+        <div class="head">
+          <h1>Admin.</h1>
+          <p>Approve sellers, block bad actors, and remove wrong reports.</p>
+        </div>
+        <div id="adminDenied" class="empty" hidden><strong>Admins only.</strong>Ask the owner for Editor access to manage sellers.</div>
+        <div id="adminBody" class="view" hidden>
+          <div class="stats" id="adminFigs">
+            <div class="stat"><b data-f="reports">0</b><span>Reports</span></div>
+            <div class="stat"><b data-f="sellers">0</b><span>Sellers</span></div>
+            <div class="stat"><b data-f="pending">0</b><span>Awaiting approval</span></div>
+            <div class="stat"><b data-f="blocked">0</b><span>Blocked</span></div>
+          </div>
           <div class="switch-row">
-            <div><h3 style="font-size:16px">Aluth sellersla approve karanna one</h3>
-              <p>On kalama, admin approve karana kam aluth sellerge reports score ekata ekathu wenne na.</p></div>
-            <button type="button" class="switch" id="approvalSwitch" role="switch" aria-checked="false" aria-label="Aluth sellersla approve karanna one"></button>
+            <div><h3>Require approval for new sellers</h3><p>When on, a new seller's reports don't count toward scores until an admin approves them.</p></div>
+            <button type="button" class="switch" id="approvalSwitch" role="switch" aria-checked="false" aria-label="Require approval for new sellers"></button>
+          </div>
+          <div class="sec">
+            <div class="sec-h"><h2>Sellers</h2>
+              <div class="filters" id="sellerFilter">
+                <button type="button" data-sf="all" aria-pressed="true">All</button>
+                <button type="button" data-sf="pending" aria-pressed="false">Pending</button>
+                <button type="button" data-sf="approved" aria-pressed="false">Approved</button>
+                <button type="button" data-sf="blocked" aria-pressed="false">Blocked</button>
+              </div>
+            </div>
+            <div id="sellerList"></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h"><h2>Latest reports</h2><span class="aside">Newest 30</span></div>
+            <div id="adminReports"></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h"><h2>How roles work</h2></div>
+            <div class="tablewrap"><table class="table">
+              <thead><tr><th>Role</th><th>How someone gets it</th><th>Can do</th></tr></thead>
+              <tbody>
+                <tr><td><span class="pill p-admin">Admin</span></td><td>The owner, or anyone given <b>Editor</b> access in the Share menu</td><td>Everything, plus this panel</td></tr>
+                <tr><td><span class="pill">Seller</span></td><td>Given <b>Contributor</b> access</td><td>Check and report</td></tr>
+                <tr><td><span class="pill p-pending">Pending</span></td><td>New seller while approval is on</td><td>Check and report; reports don't count yet</td></tr>
+                <tr><td><span class="pill p-blocked"><span>Blocked</span></span></td><td>Blocked by an admin</td><td>Check only; past reports stop counting</td></tr>
+              </tbody>
+            </table></div>
+            <p class="hint">To add an admin, open this page's Share menu and give them Editor access.</p>
           </div>
         </div>
-        <div class="section">
-          <h3>Sellers</h3>
-          <div class="filter" id="sellerFilter">
-            <button type="button" data-sf="all" aria-pressed="true">Okkoma</button>
-            <button type="button" data-sf="pending" aria-pressed="false">Approve karanna</button>
-            <button type="button" data-sf="approved" aria-pressed="false">Approved</button>
-            <button type="button" data-sf="blocked" aria-pressed="false">Blocked</button>
-          </div>
-          <div class="list" id="sellerList"></div>
-        </div>
-        <div class="section">
-          <h3>Aluthma reports</h3>
-          <div class="list" id="adminReports"></div>
-        </div>
-        <div class="panel">
-          <h3 style="font-size:16px">Roles wada karanne mehemai</h3>
-          <div class="legend">
-            <div><span class="role-pill st-admin">Admin</span><span>Owner saha Share menu eken <b>Editor</b> access dunna aya. Me panel eka pennanne ewunta witharai.</span></div>
-            <div><span class="role-pill st-approved">Seller</span><span>Share menu eken <b>Contributor</b> access dunna aya. Check saha report karanna puluwan.</span></div>
-            <div><span class="role-pill st-pending">Pending</span><span>Approval on nam, admin approve karana kam reports score ekata ganne na.</span></div>
-            <div><span class="role-pill st-blocked">Blocked</span><span>Report karanna ba. Kalin dapu reports score eken ain wenawa.</span></div>
-          </div>
-          <p class="fine">Aluth admin kenek add karanna: artifact eke Share menu eka open karala eyata Editor access denna.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- INFO -->
-  <section class="view" data-view="info" hidden>
-    <div class="view-head">
-      <h2>Hariyata wada karanne mehemai</h2>
-      <p>Lankawe online sellersla ekathu wela hadana COD trust network ekak.</p>
-    </div>
-    <ol class="steps">
-      <li><span>Order ekak awama customer ge number eka <b>Check</b> karanna.</span></li>
-      <li><span>Stamp eka balala COD yawanawada, advance gannawada kiyala theeranaya karanna.</span></li>
-      <li><span>Parcel eka giyata passe <b>Delivered</b>, <b>Reject</b>, nathnam <b>Fake</b> kiyala report karanna.</span></li>
-      <li><span>Hama sellerma report karana tharamata score eka hariyata hadenawa.</span></li>
-    </ol>
-    <div class="section">
-      <h3>Stamp eke theruma</h3>
-      <div class="legend">
-        <div><span class="mini-stamp lv-good">Hariyata</span><span>Score 75+. Kalin parcels hariyata baragena. COD yawanna puluwan.</span></div>
-        <div><span class="mini-stamp lv-watch">Balala</span><span>Score 45 to 74, nathnam data madi. Call ekak dala confirm karanna.</span></div>
-        <div><span class="mini-stamp lv-risk">Risk</span><span>Score 45 ta adui, sellersla godak denekta reject/fake. Advance nathuwa yawanna epa.</span></div>
-        <div><span class="mini-stamp lv-new">Aluth</span><span>Thama data na. Aluth customer kenek.</span></div>
-      </div>
-    </div>
-    <div class="section">
-      <h3>Saadharanaya saha privacy</h3>
-      <p>Phone number eka database ekata yanne na. Yanne SHA-256 hash ekak witharai, eken number eka aye hoyaganna amarui.</p>
-      <p>Ek seller kenekge ek report ekakin witharak kauruwath <b>Risk</b> wenne na. Fake order ekak reject ekakata wada deguna barai.</p>
-    </div>
-    <div class="section">
-      <h3>Plans</h3>
-      <div class="plans">
-        <div class="plan"><strong>Free</strong><b>Rs. 0</b><span>Maasekata checks 30</span></div>
-        <div class="plan pick"><strong>Starter</strong><b>Rs. 990</b><span>Checks 300, bulk check, WhatsApp bot</span></div>
-        <div class="plan"><strong>Pro</strong><b>Rs. 2,490</b><span>Unlimited, courier link, staff 3 denek</span></div>
-      </div>
-      <p class="fine">Beta eke danata hama feature ekakma free.</p>
-    </div>
-    <p class="fine">Hariyata v0.2 beta, Trivex IT. Score eka sellersla report karapu data walin witharai hadenne. Antima theeranaya oyage.</p>
-  </section>
+      <!-- INFO -->
+      <section class="view" data-view="info" hidden>
+        <div class="head">
+          <h1>How Hariyata works.</h1>
+          <p>A shared COD trust network for Sri Lankan online sellers.</p>
+        </div>
+        <ol class="steps">
+          <li><span>When an order comes in, <b>check</b> the customer's number.</span></li>
+          <li><span>Use the verdict to decide: ship COD, call to confirm, or ask for an advance.</span></li>
+          <li><span>After delivery, <b>report</b> the result: delivered, rejected or fake.</span></li>
+          <li><span>Every seller's reports combine into a score that gets sharper over time.</span></li>
+        </ol>
+        <div class="sec">
+          <div class="sec-h"><h2>Reading a verdict</h2><span class="aside">More ink, more risk</span></div>
+          <div class="vlegend">
+            <div class="vcard v-safe"><div class="top"><span>Safe</span></div><p><b>Score 75 to 100.</b> Has accepted COD parcels before. Ship as normal.</p></div>
+            <div class="vcard v-confirm"><div class="top"><span>Confirm</span></div><p><b>Score 45 to 74, or little data.</b> Call to confirm before shipping.</p></div>
+            <div class="vcard v-risk"><div class="top"><span>Risk</span></div><p><b>Below 45.</b> Rejected or faked orders with several sellers. Take an advance.</p></div>
+            <div class="vcard v-new"><div class="top"><span>New</span></div><p><b>No reports yet.</b> A new customer. Confirm, then report the result.</p></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-h"><h2>Fair and private</h2></div>
+          <div class="prose">
+            <p><b>Numbers are never stored.</b> Each number is turned into a one-way SHA-256 hash before it reaches the database.</p>
+            <p><b>One report can't ruin anyone.</b> A single report from one seller never produces a Risk verdict, and each seller holds one record per number.</p>
+            <p><b>Fake orders weigh double.</b> A fake order counts twice as much as a rejection.</p>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-h"><h2>Plans</h2><span class="aside">Free during beta</span></div>
+          <div class="plans">
+            <div class="plan"><h3>Free</h3><b>Rs. 0</b><span>30 checks a month</span></div>
+            <div class="plan pick"><h3>Starter</h3><b>Rs. 990</b><span>300 checks, bulk check, WhatsApp bot</span></div>
+            <div class="plan"><h3>Pro</h3><b>Rs. 2,490</b><span>Unlimited, courier sync, 3 staff</span></div>
+          </div>
+        </div>
+        <footer class="fine">Hariyata v0.3 beta by Trivex IT. Scores come only from seller reports. The final call is always yours.</footer>
+      </section>
+    </main>
+  </div>
 </div>
 
-<nav class="tabbar" aria-label="Sections">
-  <div class="tabbar-in">
-    <a href="#check" data-route="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Check</a>
-    <a href="#bulk" data-route="bulk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>List</a>
-    <a href="#report" data-route="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Report</a>
-    <a href="#me" data-route="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Records</a>
-    <a href="#admin" data-route="admin" id="adminTab" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/><path d="M17 4l1.5 1.5L21 3"/></svg>Admin</a>
-    <a href="#info" data-route="info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>Info</a>
-  </div>
-</nav>
-
+<nav class="tabbar" aria-label="Sections"><div class="tabbar-in" id="tabNav"></div></nav>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button id="toastUndo" type="button" hidden>Undo</button></div>
 
 <script>
@@ -499,28 +511,40 @@ input[type=number] { width: 140px; background: var(--surface); border: 2px solid
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Ink grain for stamps: an SVG noise mask so the ink looks pressed, not printed.
-  const grain = `url("data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.9 1.2"/></filter><rect width="160" height="160" filter="url(#n)"/></svg>')}")`;
-  document.documentElement.style.setProperty("--grain", grain);
+  const SVG = (d, w = 1.8) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const NAV = [
+    { r: "check", label: "Check", k: "C", icon: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>' },
+    { r: "bulk", label: "Bulk", k: "B", icon: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>' },
+    { r: "report", label: "Report", k: "R", icon: '<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>' },
+    { r: "me", label: "Records", k: "M", icon: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>' },
+    { r: "admin", label: "Admin", k: "A", icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>', admin: true },
+    { r: "info", label: "Info", k: "I", icon: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>' }
+  ];
+  function buildNav() {
+    const html = (rail) => NAV.map(n => `<a class="navlink" href="#${n.r}" data-route="${n.r}" ${n.admin ? 'data-admin hidden' : ""}>${SVG(n.icon)}<span>${n.label}</span>${rail ? `<kbd class="desk">${n.k}</kbd>` : ""}</a>`).join("");
+    $("#railNav").innerHTML = html(true);
+    $("#tabNav").innerHTML = html(false);
+  }
+  buildNav();
 
   const ICON = {
-    del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-    rej: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>',
-    fake: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+    del: SVG('<path d="M5 12.5l4.5 4.5L19 7.5"/>', 2.2),
+    rej: SVG('<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>', 2),
+    fake: SVG('<path d="M6 6l12 12M18 6L6 18"/>', 2.2)
   };
   const LEVEL = {
-    good:  { stamp: "Hariyata", sub: "COD yawanna", advice: "<strong>COD yawanna puluwan.</strong> Kalin sellersla ta parcels hariyata baragena thiyenawa." },
-    watch: { stamp: "Balala", sub: "Call karala confirm", advice: "<strong>Yawanna kalin call ekak dala confirm karanna.</strong> Puluwan nam delivery gaana advance ganna." },
-    risk:  { stamp: "Risk", sub: "Advance ganna", advice: "<strong>Advance nathuwa COD yawanna epa.</strong> Me number ekata sellersla godak denekta parcels reject nathnam fake wela." },
-    new:   { stamp: "Aluth", sub: "Thama data na", advice: "<strong>Me number eka gana thama data na.</strong> Confirm call ekak dala yawanna. Parcel eka giyata passe result eka report karanna." }
+    good:  { word: "Safe", cls: "v-safe", line: "Ship COD as normal", advice: "<strong>Ship as normal.</strong> This customer has accepted COD parcels from other sellers." },
+    watch: { word: "Confirm", cls: "v-confirm", line: "Call before you ship", advice: "<strong>Call to confirm before you ship.</strong> If you can, collect the delivery fee in advance." },
+    risk:  { word: "Risk", cls: "v-risk", line: "Take an advance", advice: "<strong>Don't send COD without an advance.</strong> Several sellers report rejected or fake orders from this number." },
+    new:   { word: "New", cls: "v-new", line: "No reports yet", advice: "<strong>No one has reported this number yet.</strong> Confirm by phone, then report the result after delivery." }
   };
-  const OUT = { del: "Delivered", rej: "Reject una", fake: "Fake order" };
+  const OUT = { del: "Delivered", rej: "Rejected", fake: "Fake" };
 
   const S = { db: null, user: null, uid: null, canWrite: null, isAdmin: false, isOwner: false, ready: false, tried: false, readOnly: false,
     myDocs: [], unsubMe: null, roles: {}, config: { requireApproval: false }, allReports: [], unsubAdmin: null, sellerFilter: "all" };
-
-  // Role of a seller id, as everyone's page computes it.
+  const safeId = (s) => String(s).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_");
   function statusOf(uid) {
     const r = S.roles[safeId(uid)];
     if (r && r.status === "blocked") return "blocked";
@@ -535,29 +559,42 @@ input[type=number] { width: 140px; background: var(--surface); border: 2px solid
   };
 
   // ---------- routing ----------
-  const ROUTES = ["check", "bulk", "report", "me", "admin", "info"];
+  const ROUTES = NAV.map(n => n.r);
+  let current = "check";
   function route() {
     const r = (location.hash || "").replace("#", "");
-    const cur = ROUTES.includes(r) ? r : "check";
-    $$("[data-view]").forEach(v => v.hidden = v.dataset.view !== cur);
-    $$(".tabbar a").forEach(a => { if (a.dataset.route === cur) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    current = ROUTES.includes(r) ? r : "check";
+    $$("[data-view]").forEach(v => v.hidden = v.dataset.view !== current);
+    $$(".navlink").forEach(a => { if (a.dataset.route === current) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   }
   window.addEventListener("hashchange", () => { route(); window.scrollTo(0, 0); });
   route();
+
+  // ---------- keyboard ----------
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target; const typing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA");
+    if (typing) { if (e.key === "Escape") t.blur(); return; }
+    if (e.key === "/") { e.preventDefault(); location.hash = "#check"; setTimeout(() => $("#checkInput").focus(), 0); return; }
+    const nav = NAV.find(n => n.k.toLowerCase() === e.key.toLowerCase() && (!n.admin || S.isAdmin));
+    if (nav) { location.hash = "#" + nav.r; return; }
+    if (current === "check" && ["1", "2", "3"].includes(e.key)) {
+      const b = $(`#checkResult [data-rep="${["del", "rej", "fake"][+e.key - 1]}"]`);
+      if (b && !b.disabled) b.click();
+    }
+  });
 
   // ---------- toast ----------
   let toastTimer = null, toastUndoFn = null;
   function toast(msg, undoFn) {
     $("#toastMsg").textContent = msg;
-    toastUndoFn = undoFn || null;
-    $("#toastUndo").hidden = !undoFn;
-    $("#toast").hidden = false;
+    toastUndoFn = undoFn || null; $("#toastUndo").hidden = !undoFn; $("#toast").hidden = false;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => { $("#toast").hidden = true; toastUndoFn = null; }, undoFn ? 7000 : 3500);
   }
   $("#toastUndo").addEventListener("click", async () => {
     const fn = toastUndoFn; toastUndoFn = null; $("#toast").hidden = true;
-    if (fn) { try { await fn(); toast("Report eka aye gaththa"); } catch (e) { toast("Aye ganna bari una. Thawa paarak try karanna."); } }
+    if (fn) { try { await fn(); toast("Undone"); } catch (e) { toast("Couldn't undo. Try again."); } }
   });
 
   function setNote(text, warn) {
@@ -565,10 +602,11 @@ input[type=number] { width: 140px; background: var(--surface); border: 2px solid
     if (!text) { n.hidden = true; return; }
     n.textContent = text; n.className = warn ? "warn" : ""; n.hidden = false;
   }
-  setNote("Seller network ekata connect wenawa…");
+  function setStatus(text, live) {
+    $$("[data-status]").forEach(s => { s.classList.toggle("live", !!live); s.querySelector("span").textContent = text; });
+  }
 
   // ---------- data ----------
-  const safeId = (s) => String(s).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_");
   const docIdFor = (hash) => hash + "-" + safeId(S.uid);
   async function withRetry(fn) {
     try { return await fn(); }
@@ -612,57 +650,70 @@ input[type=number] { width: 140px; background: var(--surface); border: 2px solid
   }
   function writeErrMsg(e) {
     const c = e && e.code;
-    if (c === "invalid_argument") { S.readOnly = true; applyWriteState(); return "Oyata report karanna access na. Artifact owner gen Contributor access illanna."; }
-    if (c === "quota_exceeded") return "Database eka full. Trivex team ekata kiyanna.";
-    if (c === "resource_exhausted") return "Godak ikmanata requests yawala. Thathpara kipayakin aye try karanna.";
-    return "Save une na. Internet eka check karala aye try karanna.";
+    if (c === "invalid_argument") { S.readOnly = true; applyWriteState(); return "You don't have permission to report. Ask the owner for Contributor access."; }
+    if (c === "quota_exceeded") return "The database is full. Contact Trivex IT.";
+    if (c === "resource_exhausted") return "Too many requests. Wait a few seconds and try again.";
+    return "Couldn't save. Check your connection and try again.";
   }
-  const readErrMsg = () => "Check karanna bari una. Internet eka check karala aye try karanna.";
+  const readErrMsg = () => "Couldn't check. Check your connection and try again.";
   const canReport = () => !!(S.ready && S.uid && !S.readOnly && S.canWrite !== false && statusOf(S.uid) !== "blocked");
-  const noReportReason = () => !S.uid ? "Report karanna sign in wela inna one."
-    : statusOf(S.uid) === "blocked" ? "Oyage account eka admin block karala. Report karanna ba."
-    : "Report karanna access na.";
+  const noReportReason = () => !S.uid ? "Sign in to report results."
+    : statusOf(S.uid) === "blocked" ? "Your account is blocked by an admin, so you can't report."
+    : "You don't have permission to report.";
 
-  // ---------- slip ----------
-  function outcomeButtons(attrs) {
-    const w = canReport();
-    return ["del", "rej", "fake"].map(o => `<button type="button" class="oc ${o}" ${attrs(o)} ${w ? "" : "disabled"}>${ICON[o]}${OUT[o]}</button>`).join("");
-  }
-  function slipHTML(n, r) {
+  // ---------- result ----------
+  function resultHTML(n, r) {
     const L = LEVEL[r.sc.level];
-    const a = r.agg;
-    const mine = r.mine;
-    const score = r.sc.score;
+    const a = r.agg, mine = r.mine, score = r.sc.score;
+    const w = canReport();
+    const segs = Array.from({ length: 50 }, (_, i) => `<i data-i="${i}"></i>`).join("");
+    const letters = L.word.split("").map((ch, i) => `<span style="animation-delay:${i * 45}ms">${ch}</span>`).join("");
     return `
-      <article class="slip lv-${r.sc.level}" aria-live="polite">
-        <div class="tape"></div>
-        <div class="slip-main">
-          <div class="slip-num">${esc(H.pretty(n))}</div>
-          <div class="stamp" role="img" aria-label="${L.stamp}: ${L.sub}">${L.stamp}<small>${L.sub}</small></div>
-          <div class="slip-sub">${H.isMobile(n) ? "Customer number" : "Landline ekak wage"}${a.sellers ? `, sellersla ${a.sellers} denek report karala` : ""}</div>
+      <article class="result ${L.cls}" aria-live="polite">
+        <div class="verdict">
+          <div class="verdict-word" aria-label="${L.word}">${letters}</div>
+          <div class="verdict-line">${L.line}</div>
+          <div class="verdict-num">${esc(H.pretty(n))}</div>
         </div>
-        <div class="ruler-wrap">
-          <div class="ruler-head"><span>Trust score</span><b>${score == null ? "Thama na" : score}</b></div>
-          <div class="ruler" role="img" aria-label="${score == null ? "No score yet" : "Score " + score + " of 100"}">${score == null ? "" : `<i style="--x:0" data-x="${score}"></i>`}</div>
-          <div class="ticks" aria-hidden="true"><span style="left:0">0</span><span style="left:45%">45</span><span style="left:75%">75</span><span style="left:100%">100</span></div>
-        </div>
-        <div class="counts">
-          <span><b>${a.del}</b>delivered</span><span><b>${a.rej}</b>reject</span><span><b>${a.fake}</b>fake</span>
-        </div>
-        <p class="advice">${L.advice}</p>
-        <div class="tear" aria-hidden="true"></div>
-        <div class="slip-report">
-          <h3>Parcel eka giyata passe mehenma report karanna</h3>
-          <div class="outcomes">${outcomeButtons(o => `data-rep="${o}"`)}</div>
-          ${mine ? `<p class="hint">Oyage record: delivered ${mine.del | 0}, reject ${mine.rej | 0}, fake ${mine.fake | 0}</p>` : ""}
-          ${canReport() ? "" : `<p class="hint">${noReportReason()}</p>`}
+        <div class="rbody">
+          <div class="score-row">
+            <div><div class="score-big" data-score="${score == null ? "" : score}">${score == null ? "—" : "0"}<small>${score == null ? "" : "/100"}</small></div><div class="score-label">Trust score</div></div>
+            <div class="meter">
+              <div class="segs" data-fill="${score == null ? 0 : Math.round(score / 2)}" role="img" aria-label="${score == null ? "No score yet" : `Score ${score} of 100`}">${segs}</div>
+              <div class="scale" aria-hidden="true"><span class="s0" style="left:0">0</span><span style="left:45%">45</span><span style="left:75%">75</span><span class="s100" style="left:100%">100</span></div>
+            </div>
+          </div>
+          <div class="breakdown">
+            <div><b>${a.del}</b><span>Delivered</span></div>
+            <div><b>${a.rej}</b><span>Rejected</span></div>
+            <div><b>${a.fake}</b><span>Fake</span></div>
+          </div>
+          <p class="advice">${L.advice}</p>
+          <p class="sub">${a.sellers ? `Based on ${a.sellers} seller${a.sellers === 1 ? "" : "s"}.` : "No seller has reported this number."}${H.isMobile(n) ? "" : " This looks like a landline."}</p>
+          <div class="field">
+            <span class="lbl">After delivery, report the result</span>
+            <div class="seg3">${["del", "rej", "fake"].map((o, i) => `<button type="button" data-rep="${o}" ${w ? "" : "disabled"}>${ICON[o]}<span>${OUT[o]}</span><kbd class="desk">${i + 1}</kbd></button>`).join("")}</div>
+            ${mine ? `<p class="hint">Your record for this number: ${mine.del | 0} delivered, ${mine.rej | 0} rejected, ${mine.fake | 0} fake.</p>` : ""}
+            ${w ? "" : `<p class="hint">${noReportReason()}</p>`}
+          </div>
         </div>
       </article>`;
   }
-  function settle(root, stampIt) {
-    const st = $(".stamp", root), sl = $(".slip", root);
-    if (stampIt && st) { st.classList.add("thunk"); sl && sl.classList.add("jolt"); }
-    requestAnimationFrame(() => requestAnimationFrame(() => $$(".ruler i", root).forEach(i => i.style.setProperty("--x", i.dataset.x))));
+  function animateResult(root, fresh) {
+    const res = $(".result", root); if (!res) return;
+    if (fresh && !reduceMotion) res.classList.add("reveal");
+    const big = $(".score-big", res), target = big.dataset.score === "" ? null : +big.dataset.score;
+    const segs = $$(".segs i", res), fill = +$(".segs", res).dataset.fill;
+    if (target == null) return;
+    if (!fresh || reduceMotion) { big.firstChild.nodeValue = String(target); segs.forEach((s, i) => s.classList.toggle("on", i < fill)); return; }
+    const t0 = performance.now(), dur = 900;
+    const step = (t) => {
+      const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      big.firstChild.nodeValue = String(Math.round(target * e));
+      const k = Math.round(fill * e); segs.forEach((s, i) => s.classList.toggle("on", i < k));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
   }
 
   // ---------- check ----------
@@ -670,26 +721,27 @@ input[type=number] { width: 140px; background: var(--surface); border: 2px solid
   async function runCheck(raw) {
     const err = $("#checkErr"); err.hidden = true;
     const n = H.normalize(raw);
-    if (!n) { err.textContent = "Number eka hari na. 077 123 4567 wage digits 10 gahala balanna."; err.hidden = false; return; }
-    if (!S.ready) { err.textContent = S.tried ? "Check karanna sign in wela inna one." : "Thama connect wenawa. Thathpara kipayakin aye try karanna."; err.hidden = false; return; }
-    const btn = $("#checkBtn"); btn.disabled = true; btn.textContent = "Balanawa…";
+    if (!n) { err.textContent = "That isn't a valid Sri Lankan number. Try 10 digits, like 077 123 4567."; err.hidden = false; return; }
+    if (!S.ready) { err.textContent = S.tried ? "Sign in to check numbers." : "Still connecting. Try again in a moment."; err.hidden = false; return; }
+    const btn = $("#checkBtn"), box = $("#cmdBox");
+    btn.disabled = true; box.classList.add("busy");
     try {
       const res = (await lookup([n])).get(n);
       lastChecked = n;
       renderCheck(n, res, true);
       pushHistory(n, res.sc.level);
     } catch (e) { err.textContent = readErrMsg(e); err.hidden = false; }
-    finally { btn.disabled = false; btn.textContent = "Check karanna"; }
+    finally { btn.disabled = false; box.classList.remove("busy"); }
   }
-  function renderCheck(n, res, stampIt) {
+  function renderCheck(n, res, fresh) {
     const box = $("#checkResult");
-    box.innerHTML = slipHTML(n, res);
-    settle(box, stampIt);
+    box.innerHTML = resultHTML(n, res);
+    animateResult(box, fresh);
     $$("[data-rep]", box).forEach(b => b.addEventListener("click", () => doReport(n, b.dataset.rep, b, async () => {
-      const fresh = (await lookup([n])).get(n); renderCheck(n, fresh, true); pushHistory(n, fresh.sc.level);
+      const r2 = (await lookup([n])).get(n); renderCheck(n, r2, false); pushHistory(n, r2.sc.level);
     })));
   }
-  $("#checkForm").addEventListener("submit", (e) => { e.preventDefault(); runCheck($("#checkInput").value); });
+  $("#checkForm").addEventListener("submit", (e) => { e.preventDefault(); $("#checkInput").blur(); runCheck($("#checkInput").value); });
 
   async function doReport(n, outcome, btn, after) {
     if (!canReport()) return;
@@ -697,7 +749,7 @@ input[type=number] { width: 140px; background: var(--surface); border: 2px solid
     btns.forEach(b => b.disabled = true);
     try {
       const { undo } = await report(n, outcome);
-      toast(`${H.masked(n)}: ${OUT[outcome]} kiyala report kala`, async () => { await undo(); if (after) await after(); });
+      toast(`Reported ${H.masked(n)} as ${OUT[outcome].toLowerCase()}`, async () => { await undo(); if (after) await after(); });
       if (after) await after();
     } catch (e) {
       toast(writeErrMsg(e));
@@ -713,40 +765,38 @@ input[type=number] { width: 140px; background: var(--surface); border: 2px solid
   }
   function timeAgo(t) {
     const s = Math.round((Date.now() - t) / 1000);
-    if (s < 60) return "Dan";
-    if (s < 3600) return Math.floor(s / 60) + " min kalin";
-    if (s < 86400) return Math.floor(s / 3600) + " paya kalin";
-    return Math.floor(s / 86400) + " dawasa kalin";
+    if (s < 60) return "Just now";
+    if (s < 3600) return Math.floor(s / 60) + " min ago";
+    if (s < 86400) return Math.floor(s / 3600) + " h ago";
+    return Math.floor(s / 86400) + " d ago";
   }
+  function tagHTML(level) { const L = LEVEL[level] || LEVEL.new; return `<span class="tag ${L.cls}"><span class="swatch"></span>${L.word}</span>`; }
   function renderHistory() {
     const h = LS.get("history", []);
     $("#historyBox").hidden = h.length === 0;
-    $("#historyList").innerHTML = h.map(x => {
-      const lv = LEVEL[x.level] ? x.level : "new";
-      return `<div class="item lv-${lv}">
-        <span class="dot"></span>
+    $("#historyList").innerHTML = h.map(x => `
+      <div class="item">
         <div><div class="n">${esc(H.pretty(x.n))}</div><div class="meta">${timeAgo(x.t)}</div></div>
-        <div style="display:flex;gap:10px;align-items:center"><span class="verdict">${LEVEL[lv].stamp}</span><button class="tiny" type="button" data-recheck="${esc(x.n)}">Aye balanna</button></div>
-      </div>`;
-    }).join("");
+        <div class="row" style="gap:14px">${tagHTML(x.level)}<button class="chipbtn" type="button" data-recheck="${esc(x.n)}">Check again</button></div>
+      </div>`).join("");
     $$("[data-recheck]").forEach(b => b.addEventListener("click", () => {
       $("#checkInput").value = H.pretty(b.dataset.recheck); runCheck(b.dataset.recheck);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
     }));
   }
   $("#clearHistory").addEventListener("click", () => { LS.set("history", []); renderHistory(); });
   renderHistory();
 
   // ---------- bulk ----------
-  const SAMPLE = `Example list (boru numbers)
+  const SAMPLE = `Example list (made-up numbers)
 Order #1041, Nimal Perera, Kandy, 077 123 4567, Rs. 2,450 COD
-Order #1042, Kumari, Galle, +94 71 234 5678, items 2
+Order #1042, Kumari, Galle, +94 71 234 5678, 2 items
 #1043 Sahan | Kurunegala | 0761112223 | Rs.3900
 Order #1044, Fathima, Colombo 10, 075-998-1200
 #1045 Dinesh, Matara 0702223334 (call after 6pm)`;
   function updateFound() {
     const k = H.extract($("#bulkInput").value).length;
-    $("#bulkFound").textContent = k ? `Numbers ${k} hambuna.${k > 90 ? " Mul 90 witharai check karanne." : ""}` : "Ekaparakata numbers 90 wenakam.";
+    $("#bulkFound").textContent = k ? `${k} number${k === 1 ? "" : "s"} found.${k > 90 ? " Only the first 90 will be checked." : ""}` : "Up to 90 numbers at a time.";
   }
   $("#bulkSample").addEventListener("click", () => { $("#bulkInput").value = SAMPLE; updateFound(); });
   $("#bulkInput").addEventListener("input", updateFound);
@@ -755,12 +805,12 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
     e.preventDefault();
     const err = $("#bulkErr"); err.hidden = true;
     const nums = H.extract($("#bulkInput").value).slice(0, 90);
-    if (!nums.length) { err.textContent = "List eke phone numbers hambune na. 077 123 4567 wage numbers thiyenawada balanna."; err.hidden = false; return; }
-    if (!S.ready) { err.textContent = S.tried ? "Check karanna sign in wela inna one." : "Thama connect wenawa. Thathpara kipayakin aye try karanna."; err.hidden = false; return; }
-    const btn = $("#bulkBtn"); btn.disabled = true; btn.textContent = "Balanawa…";
+    if (!nums.length) { err.textContent = "No phone numbers found. Check the list has numbers like 077 123 4567."; err.hidden = false; return; }
+    if (!S.ready) { err.textContent = S.tried ? "Sign in to check numbers." : "Still connecting. Try again in a moment."; err.hidden = false; return; }
+    const btn = $("#bulkBtn"); btn.disabled = true; btn.textContent = "Checking…";
     try { bulkNums = nums; await renderBulk(); }
     catch (e2) { err.textContent = readErrMsg(e2); err.hidden = false; }
-    finally { btn.disabled = false; btn.textContent = "Okkoma check karanna"; }
+    finally { btn.disabled = false; btn.textContent = "Check all"; }
   });
   async function renderBulk() {
     const res = await lookup(bulkNums);
@@ -768,54 +818,56 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
     const rows = bulkNums.map(n => ({ n, r: res.get(n) })).sort((a, b) => order[a.r.sc.level] - order[b.r.sc.level]);
     const count = { risk: 0, watch: 0, new: 0, good: 0 };
     rows.forEach(x => count[x.r.sc.level]++);
-    const total = rows.length;
-    const lv = ["risk", "watch", "new", "good"];
+    const total = rows.length, lv = ["risk", "watch", "new", "good"], w = canReport();
+    const acts = (n) => ["del", "rej", "fake"].map(o => `<button type="button" class="chipbtn" data-bn="${n}" data-bo="${o}" ${w ? "" : "disabled"}>${OUT[o]}</button>`).join("");
     $("#bulkResult").innerHTML = `
-      <div class="panel">
-        <div class="mix" role="img" aria-label="Risk ${count.risk}, Balala ${count.watch}, Aluth ${count.new}, Hariyata ${count.good}">
-          ${lv.filter(k => count[k]).map(k => `<span class="lv-${k}" style="width:${(count[k] / total) * 100}%"></span>`).join("")}
+      <div class="view" style="gap:16px">
+        <div class="dist" role="img" aria-label="${lv.map(k => `${LEVEL[k].word} ${count[k]}`).join(", ")}">
+          ${lv.filter(k => count[k]).map(k => `<span class="${LEVEL[k].cls}" style="flex:${count[k]}"></span>`).join("")}
         </div>
-        <div class="mix-legend">${lv.map(k => `<span class="lv-${k}"><i></i>${LEVEL[k].stamp} <b>${count[k]}</b></span>`).join("")}</div>
-        <div class="list">
-          ${rows.map(({ n, r }) => `
-            <div class="item lv-${r.sc.level}">
-              <span class="dot"></span>
-              <div><div class="n">${esc(H.pretty(n))}</div>
-                <div class="meta">delivered ${r.agg.del}, reject ${r.agg.rej}, fake ${r.agg.fake}${r.sc.score == null ? "" : `, score ${r.sc.score}`}</div></div>
-              <span class="verdict">${LEVEL[r.sc.level].stamp}</span>
-              <div class="acts">${["del", "rej", "fake"].map(o => `<button type="button" class="tiny" data-bn="${n}" data-bo="${o}" ${canReport() ? "" : "disabled"}>${OUT[o]}</button>`).join("")}</div>
-            </div>`).join("")}
-        </div>
-        <p class="fine">Risk ewa udinma pennanawa. Parcel giyata passe mehenma report karanna puluwan.</p>
+        <div class="legend">${lv.map(k => `<span class="${LEVEL[k].cls}"><span class="swatch"></span>${LEVEL[k].word} <b>${count[k]}</b></span>`).join("")}</div>
+        <div class="tablewrap only-wide"><table class="table">
+          <thead><tr><th>Number</th><th>Verdict</th><th class="r">Score</th><th class="r">Delivered</th><th class="r">Rejected</th><th class="r">Fake</th><th class="r">Report</th></tr></thead>
+          <tbody>${rows.map(({ n, r }) => `<tr>
+            <td class="n">${esc(H.pretty(n))}</td><td>${tagHTML(r.sc.level)}</td>
+            <td class="r tnum">${r.sc.score == null ? "—" : r.sc.score}</td><td class="r tnum">${r.agg.del}</td><td class="r tnum">${r.agg.rej}</td><td class="r tnum">${r.agg.fake}</td>
+            <td class="r"><div class="acts">${acts(n)}</div></td></tr>`).join("")}</tbody>
+        </table></div>
+        <div class="list only-narrow">${rows.map(({ n, r }) => `
+          <div class="item">
+            <div><div class="n">${esc(H.pretty(n))}</div><div class="meta">${r.sc.score == null ? "No score" : "Score " + r.sc.score}, ${r.agg.del} delivered, ${r.agg.rej} rejected, ${r.agg.fake} fake</div></div>
+            ${tagHTML(r.sc.level)}
+            <div class="acts">${acts(n)}</div>
+          </div>`).join("")}</div>
       </div>`;
     $$("[data-bn]", $("#bulkResult")).forEach(b => b.addEventListener("click", () => doReport(b.dataset.bn, b.dataset.bo, b, renderBulk)));
   }
 
   // ---------- report ----------
   let chosen = null;
-  $("#reportChoices").innerHTML = ["del", "rej", "fake"].map(o => `<button type="button" class="oc ${o}" data-outcome="${o}" aria-pressed="false">${ICON[o]}${OUT[o]}</button>`).join("");
-  $$("#reportChoices .oc").forEach(b => b.addEventListener("click", () => {
+  $("#reportChoices").innerHTML = ["del", "rej", "fake"].map(o => `<button type="button" data-outcome="${o}" aria-pressed="false">${ICON[o]}<span>${OUT[o]}</span></button>`).join("");
+  $$("#reportChoices button").forEach(b => b.addEventListener("click", () => {
     chosen = b.dataset.outcome;
-    $$("#reportChoices .oc").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    $$("#reportChoices button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
     $("#reportBtn").disabled = !canReport();
   }));
   $("#reportForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const err = $("#reportErr"); err.hidden = true;
     const n = H.normalize($("#reportInput").value);
-    if (!n) { err.textContent = "Number eka hari na. 077 123 4567 wage digits 10 gahala balanna."; err.hidden = false; return; }
-    if (!chosen) { err.textContent = "Delivered, Reject, Fake eken ekak thoranna."; err.hidden = false; return; }
+    if (!n) { err.textContent = "That isn't a valid Sri Lankan number. Try 10 digits, like 077 123 4567."; err.hidden = false; return; }
+    if (!chosen) { err.textContent = "Choose Delivered, Rejected or Fake."; err.hidden = false; return; }
     if (!canReport()) { err.textContent = noReportReason(); err.hidden = false; return; }
-    const btn = $("#reportBtn"); btn.disabled = true; btn.textContent = "Save karanawa…";
+    const btn = $("#reportBtn"); btn.disabled = true; btn.textContent = "Saving…";
     try {
       const { undo } = await report(n, chosen);
-      toast(`${H.masked(n)}: ${OUT[chosen]} kiyala report kala`, undo);
+      toast(`Reported ${H.masked(n)} as ${OUT[chosen].toLowerCase()}`, undo);
       $("#reportInput").value = ""; chosen = null;
-      $$("#reportChoices .oc").forEach(x => x.setAttribute("aria-pressed", "false"));
-      btn.textContent = "Report karanna"; btn.disabled = true;
+      $$("#reportChoices button").forEach(x => x.setAttribute("aria-pressed", "false"));
+      btn.textContent = "Save report"; btn.disabled = true;
     } catch (e2) {
       err.textContent = writeErrMsg(e2); err.hidden = false;
-      btn.textContent = "Report karanna"; btn.disabled = !canReport();
+      btn.textContent = "Save report"; btn.disabled = !canReport();
     }
   });
 
@@ -823,6 +875,12 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
   const feeInput = $("#feeInput");
   feeInput.value = LS.get("fee", 450);
   feeInput.addEventListener("input", () => { LS.set("fee", Math.max(0, Number(feeInput.value) || 0)); renderMe(); });
+  function armed(b, label, armedLabel) {
+    if (b.dataset.armed === "1") return true;
+    b.dataset.armed = "1"; b.textContent = armedLabel;
+    setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = label; } }, 4000);
+    return false;
+  }
   function renderMe() {
     const docs = S.myDocs;
     const t = { total: docs.length, del: 0, rej: 0, fake: 0 };
@@ -831,40 +889,32 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
     const fee = Math.max(0, Number(feeInput.value) || 0);
     $("#meLoss").textContent = "Rs. " + ((t.rej + t.fake) * fee).toLocaleString("en-US");
     const list = $("#meList");
-    if (!S.uid) { list.innerHTML = `<p class="empty">Oyage records balanna sign in wela inna one.</p>`; return; }
-    if (!docs.length) { list.innerHTML = `<p class="empty">Thama reports na. Parcel ekak giyata passe <a href="#report">Report</a> tab eken result eka danna.</p>`; return; }
+    if (!S.uid) { list.innerHTML = `<div class="empty"><strong>Sign in to see your records.</strong></div>`; return; }
+    if (!docs.length) { list.innerHTML = `<div class="empty"><strong>No reports yet.</strong>After a parcel is delivered or returned, record it in <a href="#report">Report</a>.</div>`; return; }
     const sorted = docs.slice().sort((a, b) => String(b.at).localeCompare(String(a.at)));
-    list.innerHTML = sorted.map(d => {
-      const lv = d.last === "del" ? "good" : d.last === "rej" ? "watch" : "risk";
-      return `<div class="item lv-${lv}">
-        <span class="dot"></span>
+    list.innerHTML = `<div class="list">${sorted.map(d => `
+      <div class="item">
         <div><div class="n">${esc(d.m || "Number")}</div>
-          <div class="meta">delivered ${d.del | 0}, reject ${d.rej | 0}, fake ${d.fake | 0}${d.at ? ", " + esc(new Date(d.at).toLocaleDateString("en-GB")) : ""}</div></div>
-        <span class="verdict">${esc(OUT[d.last] || "")}</span>
-        <div class="acts"><button class="tiny danger" type="button" data-del="${esc(d._id)}">Record eka ain karanna</button></div>
-      </div>`;
-    }).join("");
+          <div class="meta">${d.del | 0} delivered, ${d.rej | 0} rejected, ${d.fake | 0} fake${d.at ? ", " + esc(new Date(d.at).toLocaleDateString("en-GB")) : ""}</div></div>
+        <span class="tag">${esc(OUT[d.last] || "")}</span>
+        <div class="acts"><button class="chipbtn" type="button" data-del="${esc(d._id)}">Delete record</button></div>
+      </div>`).join("")}</div>`;
     $$("[data-del]", list).forEach(b => b.addEventListener("click", async () => {
-      if (b.dataset.armed !== "1") {
-        b.dataset.armed = "1"; b.textContent = "Ain karanna aye click karanna";
-        setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "Record eka ain karanna"; } }, 4000);
-        return;
-      }
+      if (!armed(b, "Delete record", "Tap again to delete")) return;
       b.disabled = true;
       const ref = S.db.doc("reports/" + b.dataset.del);
       try {
         const snap = await ref.get();
         const prev = snap.exists ? JSON.parse(JSON.stringify(snap.data())) : null;
         await ref.delete();
-        toast("Record eka ain kala", prev ? () => ref.set(prev) : null);
+        toast("Record deleted", prev ? () => ref.set(prev) : null);
       } catch (e) { toast(writeErrMsg(e)); b.disabled = false; }
     }));
   }
   function subscribeMe() {
     if (S.unsubMe || !S.db || !S.uid) return;
     S.unsubMe = S.db.collection("reports").where("by", "==", S.uid).onSnapshot(snap => {
-      S.myDocs = snap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
-      renderMe();
+      S.myDocs = snap.docs.map(d => Object.assign({ _id: d.id }, d.data())); renderMe();
     }, () => {});
   }
   renderMe();
@@ -874,8 +924,8 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
     $("#reportBtn").disabled = !(w && chosen);
     $$("[data-rep], [data-bn]").forEach(b => b.disabled = !w);
     const st = S.uid ? statusOf(S.uid) : null;
-    if (S.ready && !w) setNote(noReportReason() + (S.uid && st !== "blocked" ? " Check karanna nam puluwan." : ""), true);
-    else if (S.ready && st === "pending" && !S.isAdmin) setNote("Oyage account eka admin approve karana kam oyage reports score ekata ekathu wenne na. Check karanna saha report karanna puluwan.", true);
+    if (S.ready && !w) setNote(noReportReason() + (S.uid && st !== "blocked" ? " You can still check numbers." : ""), true);
+    else if (S.ready && st === "pending" && !S.isAdmin) setNote("Your account is awaiting admin approval. Until then, your reports won't count toward scores.", true);
     else if (S.ready) setNote("");
     renderMeRole();
   }
@@ -883,11 +933,11 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
     const el = $("#meRole"); if (!el) return;
     if (!S.uid) { el.innerHTML = ""; return; }
     const st = S.isAdmin ? "admin" : statusOf(S.uid);
-    const label = { admin: S.isOwner ? "Owner" : "Admin", approved: "Seller", pending: "Pending approval", blocked: "Blocked" }[st];
-    el.innerHTML = `<span>Oyage role:</span><span class="role-pill st-${st}">${label}</span>`;
+    const map = { admin: [S.isOwner ? "Owner" : "Admin", "p-admin"], approved: ["Seller", ""], pending: ["Awaiting approval", "p-pending"], blocked: ["Blocked", "p-blocked"] }[st];
+    el.innerHTML = `<span class="hint">Your role</span><span class="pill ${map[1]}">${map[1] === "p-blocked" ? `<span>${map[0]}</span>` : map[0]}</span>`;
   }
 
-  // ---------- roles & config (everyone reads) ----------
+  // ---------- roles & config ----------
   function subscribeRoles() {
     S.db.collection("roles").onSnapshot(snap => {
       const m = {}; snap.docs.forEach(d => { m[d.id] = d.data(); }); S.roles = m;
@@ -900,12 +950,8 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
   }
 
   // ---------- admin ----------
-  function adminErr(e) {
-    const c = e && e.code;
-    if (c === "invalid_argument") return "Me wenas karanna admin (Editor) access one.";
-    return "Save une na. Internet eka check karala aye try karanna.";
-  }
-  async function setStatus(uid, status) {
+  const adminErr = (e) => (e && e.code === "invalid_argument") ? "You need Editor access to change this." : "Couldn't save. Check your connection and try again.";
+  async function setRole(uid, status) {
     const ref = S.db.doc("roles/" + safeId(uid));
     const snap = await ref.get();
     const prev = snap.exists ? JSON.parse(JSON.stringify(snap.data())) : null;
@@ -915,14 +961,13 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
   function subscribeAdmin() {
     if (S.unsubAdmin || !S.isAdmin) return;
     S.unsubAdmin = S.db.collection("reports").orderBy("at", "desc").limit(1000).onSnapshot(snap => {
-      S.allReports = snap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
-      renderAdmin();
+      S.allReports = snap.docs.map(d => Object.assign({ _id: d.id }, d.data())); renderAdmin();
     }, () => {});
   }
-  let adminRenderSeq = 0;
+  let adminSeq = 0;
   async function renderAdmin() {
     if (!S.isAdmin) return;
-    const seq = ++adminRenderSeq;
+    const seq = ++adminSeq;
     const reps = S.allReports;
     const sellers = new Map();
     reps.forEach(r => {
@@ -932,103 +977,84 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
       if (String(r.at) > s.at) s.at = String(r.at);
       sellers.set(r.by, s);
     });
-    // Sellers blocked or approved before they reported still show up.
     Object.values(S.roles).forEach(r => { if (r && r.uid && !sellers.has(r.uid)) sellers.set(r.uid, { uid: r.uid, n: 0, del: 0, rej: 0, fake: 0, at: "" }); });
     const list = Array.from(sellers.values());
-    const ids = list.map(s => s.uid).concat(reps.slice(0, 30).map(r => r.by)).filter(Boolean);
-    const ps = ids.length && S.user ? await S.user.profiles(Array.from(new Set(ids))) : {};
-    if (seq !== adminRenderSeq) return;
-    const nameOf = (id) => (ps[id] && ps[id].name) || (id === S.uid ? "Oya" : "Seller");
+    const ids = Array.from(new Set(list.map(s => s.uid).concat(reps.slice(0, 30).map(r => r.by)).filter(Boolean)));
+    const ps = ids.length && S.user ? await S.user.profiles(ids) : {};
+    if (seq !== adminSeq) return;
+    const nameOf = (id) => (ps[id] && ps[id].name) || (id === S.uid ? "You" : "Unnamed seller");
     const avatarOf = (id) => (ps[id] && ps[id].avatarUrl) || "";
 
     const st = list.map(s => statusOf(s.uid));
     const f = { reports: reps.length, sellers: list.length, pending: st.filter(x => x === "pending").length, blocked: st.filter(x => x === "blocked").length };
     $$("#adminFigs [data-f]").forEach(b => b.textContent = f[b.dataset.f]);
+    $("#approvalSwitch").setAttribute("aria-checked", String(!!S.config.requireApproval));
 
-    const sw = $("#approvalSwitch");
-    sw.setAttribute("aria-checked", String(!!S.config.requireApproval));
-
-    const filt = S.sellerFilter;
-    const shown = list.filter(s => filt === "all" || statusOf(s.uid) === filt)
-      .sort((a, b) => ({ pending: 0, blocked: 1, approved: 2 }[statusOf(a.uid)] - { pending: 0, blocked: 1, approved: 2 }[statusOf(b.uid)]) || b.n - a.n);
+    const rank = { pending: 0, blocked: 1, approved: 2 };
+    const shown = list.filter(s => S.sellerFilter === "all" || statusOf(s.uid) === S.sellerFilter)
+      .sort((a, b) => rank[statusOf(a.uid)] - rank[statusOf(b.uid)] || b.n - a.n);
     const sl = $("#sellerList");
-    if (!shown.length) sl.innerHTML = `<p class="empty">${list.length ? "Me filter ekata sellersla na." : "Thama kauruwath report karala na. Sellersla report karanna patan gaththama methana pennanawa."}</p>`;
-    else {
-      sl.innerHTML = shown.map(s => {
+    if (!shown.length) {
+      sl.innerHTML = `<div class="empty"><strong>${list.length ? "No sellers match this filter." : "No sellers yet."}</strong>${list.length ? "" : "Sellers appear here after their first report."}</div>`;
+    } else {
+      sl.innerHTML = `<div class="list">${shown.map(s => {
         const status = statusOf(s.uid);
-        const lab = { approved: "Approved", pending: "Pending", blocked: "Blocked" }[status];
-        const badRate = (s.del + s.rej + s.fake) ? Math.round(((s.rej + s.fake) / (s.del + s.rej + s.fake)) * 100) : 0;
-        const acts = [];
-        if (status !== "approved") acts.push(`<button class="tiny" type="button" data-act="approved" data-uid="${esc(s.uid)}">Approve karanna</button>`);
-        if (status !== "blocked" && s.uid !== S.uid) acts.push(`<button class="tiny danger" type="button" data-act="blocked" data-uid="${esc(s.uid)}">Block karanna</button>`);
-        if (status === "blocked") acts.push(`<button class="tiny" type="button" data-act="clear" data-uid="${esc(s.uid)}">Unblock karanna</button>`);
-        return `<div class="item person">
-          <div class="who"><img alt="" data-av="${esc(s.uid)}"><div style="min-width:0"><div class="n" data-nm="${esc(s.uid)}"></div>
-            <div class="meta">reports ${s.n}, reject/fake ${badRate}%${s.at ? ", " + esc(new Date(s.at).toLocaleDateString("en-GB")) : ""}</div></div></div>
-          <span class="role-pill st-${status}">${lab}</span>
-          <div class="acts">${acts.join("")}</div>
+        const total = s.del + s.rej + s.fake;
+        const bad = total ? Math.round(((s.rej + s.fake) / total) * 100) : 0;
+        const pill = { approved: `<span class="pill">Approved</span>`, pending: `<span class="pill p-pending">Pending</span>`, blocked: `<span class="pill p-blocked"><span>Blocked</span></span>` }[status];
+        const a = [];
+        if (status !== "approved") a.push(`<button class="chipbtn" type="button" data-act="${status === "blocked" ? "unblock" : "approve"}" data-uid="${esc(s.uid)}">${status === "blocked" ? "Unblock" : "Approve"}</button>`);
+        if (status !== "blocked" && s.uid !== S.uid) a.push(`<button class="chipbtn" type="button" data-act="block" data-uid="${esc(s.uid)}">Block</button>`);
+        return `<div class="item">
+          <div class="who"><img alt="" data-av="${esc(s.uid)}"><div style="min-width:0"><div class="name" data-nm="${esc(s.uid)}"></div>
+            <div class="meta">${s.n} report${s.n === 1 ? "" : "s"}, ${bad}% rejected or fake${s.at ? ", last " + esc(new Date(s.at).toLocaleDateString("en-GB")) : ""}</div></div></div>
+          ${pill}
+          ${a.length ? `<div class="acts">${a.join("")}</div>` : ""}
         </div>`;
-      }).join("");
+      }).join("")}</div>`;
       $$("[data-nm]", sl).forEach(el => el.textContent = nameOf(el.dataset.nm));
       $$("[data-av]", sl).forEach(el => { const a = avatarOf(el.dataset.av); if (a) el.src = a; else el.hidden = true; });
       $$("[data-act]", sl).forEach(b => b.addEventListener("click", async () => {
         const uid = b.dataset.uid, act = b.dataset.act;
-        if (act === "blocked" && b.dataset.armed !== "1") {
-          b.dataset.armed = "1"; b.textContent = "Block karanna aye click karanna";
-          setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "Block karanna"; } }, 4000);
-          return;
-        }
+        if (act === "block" && !armed(b, "Block", "Tap again to block")) return;
         b.disabled = true;
         try {
-          const status = act === "clear" ? "approved" : act;
-          const undo = await setStatus(uid, status);
-          toast(`${nameOf(uid)}: ${ { approved: act === "clear" ? "unblock kala" : "approve kala", blocked: "block kala" }[status] }`, undo);
+          const undo = await setRole(uid, act === "block" ? "blocked" : "approved");
+          toast(`${nameOf(uid)} ${act === "block" ? "blocked" : act === "unblock" ? "unblocked" : "approved"}`, undo);
         } catch (e) { toast(adminErr(e)); b.disabled = false; }
       }));
     }
 
     const ar = $("#adminReports");
     const recent = reps.slice(0, 30);
-    if (!recent.length) ar.innerHTML = `<p class="empty">Thama reports na.</p>`;
-    else {
-      ar.innerHTML = recent.map(r => {
-        const lv = r.last === "del" ? "good" : r.last === "rej" ? "watch" : "risk";
-        const off = !counts(r.by);
-        return `<div class="item lv-${lv}">
-          <span class="dot"></span>
-          <div><div class="n">${esc(r.m || "Number")}</div>
-            <div class="meta"><span data-nm="${esc(r.by || "")}"></span>, delivered ${r.del | 0}, reject ${r.rej | 0}, fake ${r.fake | 0}${r.at ? ", " + esc(new Date(r.at).toLocaleDateString("en-GB")) : ""}${off ? ", score ekata ganne na" : ""}</div></div>
-          <span class="verdict">${esc(OUT[r.last] || "")}</span>
-          <div class="acts"><button class="tiny danger" type="button" data-rdel="${esc(r._id)}">Report eka ain karanna</button></div>
-        </div>`;
-      }).join("");
-      $$("[data-nm]", ar).forEach(el => el.textContent = nameOf(el.dataset.nm));
-      $$("[data-rdel]", ar).forEach(b => b.addEventListener("click", async () => {
-        if (b.dataset.armed !== "1") {
-          b.dataset.armed = "1"; b.textContent = "Ain karanna aye click karanna";
-          setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "Report eka ain karanna"; } }, 4000);
-          return;
-        }
-        b.disabled = true;
-        const ref = S.db.doc("reports/" + b.dataset.rdel);
-        try {
-          const snap = await ref.get();
-          const prev = snap.exists ? JSON.parse(JSON.stringify(snap.data())) : null;
-          await ref.delete();
-          toast("Report eka ain kala", prev ? () => ref.set(prev) : null);
-        } catch (e) { toast(writeErrMsg(e)); b.disabled = false; }
-      }));
-    }
+    if (!recent.length) { ar.innerHTML = `<div class="empty"><strong>No reports yet.</strong></div>`; return; }
+    ar.innerHTML = `<div class="list">${recent.map(r => `
+      <div class="item">
+        <div><div class="n">${esc(r.m || "Number")}</div>
+          <div class="meta"><span data-nm="${esc(r.by || "")}"></span>: ${r.del | 0} delivered, ${r.rej | 0} rejected, ${r.fake | 0} fake${r.at ? ", " + esc(new Date(r.at).toLocaleDateString("en-GB")) : ""}${counts(r.by) ? "" : ". Not counted"}</div></div>
+        <span class="tag">${esc(OUT[r.last] || "")}</span>
+        <div class="acts"><button class="chipbtn" type="button" data-rdel="${esc(r._id)}">Delete report</button></div>
+      </div>`).join("")}</div>`;
+    $$("[data-nm]", ar).forEach(el => el.textContent = nameOf(el.dataset.nm));
+    $$("[data-rdel]", ar).forEach(b => b.addEventListener("click", async () => {
+      if (!armed(b, "Delete report", "Tap again to delete")) return;
+      b.disabled = true;
+      const ref = S.db.doc("reports/" + b.dataset.rdel);
+      try {
+        const snap = await ref.get();
+        const prev = snap.exists ? JSON.parse(JSON.stringify(snap.data())) : null;
+        await ref.delete();
+        toast("Report deleted", prev ? () => ref.set(prev) : null);
+      } catch (e) { toast(writeErrMsg(e)); b.disabled = false; }
+    }));
   }
   $("#approvalSwitch").addEventListener("click", async (e) => {
-    const sw = e.currentTarget;
-    const next = !S.config.requireApproval;
+    const sw = e.currentTarget, next = !S.config.requireApproval;
     sw.disabled = true;
     try {
-      // Turning approval on: approve the admin first so their own reports keep counting.
-      if (next && S.uid && !(S.roles[safeId(S.uid)] && S.roles[safeId(S.uid)].status === "approved")) await setStatus(S.uid, "approved");
+      if (next && S.uid && !(S.roles[safeId(S.uid)] && S.roles[safeId(S.uid)].status === "approved")) await setRole(S.uid, "approved");
       await S.db.doc("config/settings").set(Object.assign({}, S.config, { requireApproval: next, by: S.uid, at: new Date().toISOString() }));
-      toast(next ? "Approval on kala. Aluth sellersla approve karanna one." : "Approval off kala. Hama sellerma ganan karanawa.");
+      toast(next ? "Approval required for new sellers" : "Approval turned off");
     } catch (err) { toast(adminErr(err)); }
     finally { sw.disabled = false; }
   });
@@ -1038,7 +1064,7 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
     renderAdmin();
   }));
   function showAdminAccess() {
-    $("#adminTab").hidden = !S.isAdmin;
+    $$("[data-admin]").forEach(a => a.hidden = !S.isAdmin);
     $("#adminBody").hidden = !S.isAdmin;
     $("#adminDenied").hidden = S.isAdmin;
   }
@@ -1046,21 +1072,19 @@ Order #1044, Fathima, Colombo 10, 075-998-1200
   // ---------- boot ----------
   async function boot() {
     const claude = window.claude;
-    if (!claude || !claude.use) { S.tried = true; setNote("Seller network ekata connect wenna bari una. Page eka Claude eke open karanna.", true); return; }
+    if (!claude || !claude.use) { S.tried = true; showAdminAccess(); setStatus("Offline"); setNote("Couldn't reach the seller network. Open this page inside Claude.", true); return; }
     const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
-    S.tried = true; S.db = db;
-    S.user = user;
+    S.tried = true; S.db = db; S.user = user;
     if (user) {
       S.uid = await user.id(); S.canWrite = await user.can("data.write");
       S.isOwner = await user.isOwner(); S.isAdmin = S.isOwner || await user.canEdit();
     }
     showAdminAccess();
-    if (!db) { setNote("Seller network ekata connect wenna sign in wela inna one.", true); renderMe(); return; }
-    S.ready = true;
-    setNote("");
+    if (!db) { setStatus("Offline"); setNote("Sign in to connect to the seller network.", true); renderMe(); return; }
+    S.ready = true; setStatus("Network live", true); setNote("");
     subscribeRoles(); subscribeMe(); subscribeAdmin(); renderMe(); applyWriteState(); renderAdmin();
     if (lastChecked) runCheck(lastChecked);
   }
-  boot().catch(() => { S.tried = true; setNote("Seller network ekata connect wenna bari una. Page eka refresh karanna.", true); });
+  boot().catch(() => { S.tried = true; setStatus("Offline"); setNote("Couldn't reach the seller network. Refresh the page.", true); });
 })();
 </script>
