@@ -1,4 +1,4 @@
-const H = require("../src/logic.js");
+const H = require("../artifact-src/logic.js");
 let fail = 0;
 const eq = (name, got, want) => {
   const ok = JSON.stringify(got) === JSON.stringify(want);

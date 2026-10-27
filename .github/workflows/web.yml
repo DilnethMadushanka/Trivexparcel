@@ -1,0 +1,46 @@
+name: Web app
+
+on:
+  push:
+    paths: ["web/**", ".github/workflows/web.yml"]
+  pull_request:
+    paths: ["web/**"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Unit tests
+        run: npm test
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Build (demo mode)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_DEMO: "1"
+          NEXT_TELEMETRY_DISABLED: "1"
+      - name: Screenshots on phone, tablet and desktop
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.55.0
+          npx playwright install --with-deps chromium
+          (npx next start -p 3000 > server.log 2>&1 &)
+          for i in $(seq 1 30); do curl -sf http://localhost:3000 >/dev/null && break; sleep 1; done
+          BASE=http://localhost:3000 OUT=screens node scripts/screens.mjs
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screens
+          path: web/screens/
+          if-no-files-found: ignore
